@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.ComponentModel;
+using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.Win32;
@@ -12,12 +13,26 @@ namespace LayoutEditor.UI.Pages
         public DeviceLayoutEditorViewModel(DeviceLayout deviceLayout)
         {
             DeviceLayout = deviceLayout;
+
         }
 
         public DeviceLayout DeviceLayout { get; }
 
+        public async void SelectDeviceImage()
+        {
+            await Task.Run(() =>
+            {
+                var dialog = new OpenFileDialog { CheckFileExists = true, Filter = "Image files(*.PNG)|*.PNG" };
+                dialog.ShowDialog();
+                DeviceImagePath = dialog.FileName;
+            });
+        }
+
         public async void Save()
         {
+            // Set the base path for images
+            DeviceLayout.ImageBasePath = Path.Combine("Images", DeviceLayout.Vendor, DeviceLayout.Type + "s");
+
             await Task.Run(() =>
             {
                 var dialog = new SaveFileDialog {Filter = "Layout Files(*.XML)|*.XML"};
@@ -29,5 +44,7 @@ namespace LayoutEditor.UI.Pages
                 file.Close();
             });
         }
+
+        public string DeviceImagePath { get; set; }
     }
 }

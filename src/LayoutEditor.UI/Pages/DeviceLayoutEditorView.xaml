@@ -4,32 +4,64 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LayoutEditor.UI.Pages"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:rgbCore="clr-namespace:RGB.NET.Core;assembly=RGB.NET.Core"
+             xmlns:s="https://github.com/canton7/Stylet"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance local:DeviceLayoutEditorViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="DeviceTypeDataProvider" MethodName="GetValues" ObjectType="{x:Type rgbCore:RGBDeviceType}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="rgbCore:RGBDeviceType" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="LightingTypeDataProvider" MethodName="GetValues" ObjectType="{x:Type rgbCore:RGBDeviceLighting}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="rgbCore:RGBDeviceLighting" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120" />
+            <ColumnDefinition Width="100" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="120"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Label Content="Name" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Height="26" />
-        <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Name}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3"/>
+        <Label Content="Name" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" />
+        <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Name}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" />
 
-        <Label Content="Description" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" Height="26" />
+        <Label Content="Description" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" />
         <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Description}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" />
 
-        <Label Content="Width" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="2" Height="26" />
-        <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Width}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="2" />
-        <Label Content="Height" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="2" Grid.Row="2" Height="26" />
-        <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Height}" VerticalAlignment="Top" Grid.Column="3" Grid.Row="2" />
+        <Label Content="Vendor" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="2" />
+        <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Vendor}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="2" />
+        <Label Content="Model" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="2" Grid.Row="2" />
+        <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Model}" VerticalAlignment="Top" Grid.Column="3" Grid.Row="2" />
 
+        <Label Content="Width" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="3" />
+        <xctk:IntegerUpDown Height="23" Value="{Binding DeviceLayout.Width}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="3" />
+        <Label Content="Height" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="2" Grid.Row="3" />
+        <xctk:IntegerUpDown Height="23" Value="{Binding DeviceLayout.Height}" VerticalAlignment="Top" Grid.Column="3" Grid.Row="3" />
+
+        <Label Content="Type" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="4" />
+        <ComboBox ItemsSource="{Binding Source={StaticResource DeviceTypeDataProvider}}" SelectedValue="{Binding DeviceLayout.Type}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="4" />
+        <Label Content="Lighting" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="2" Grid.Row="4" />
+        <ComboBox ItemsSource="{Binding Source={StaticResource LightingTypeDataProvider}}" SelectedValue="{Binding DeviceLayout.Lighting}" VerticalAlignment="Top" Grid.Column="3" Grid.Row="4" />
+
+        <Label Content="Device image" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="5" />
+        <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.DeviceImage}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" />
+        <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Right" Command="{s:Action SelectDeviceImage}">...</Button>
     </Grid>
 </UserControl>
