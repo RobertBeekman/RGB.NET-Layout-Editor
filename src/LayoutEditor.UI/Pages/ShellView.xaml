@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LayoutEditor.UI.Pages"
         mc:Ignorable="d"
-        Title="Stylet Start Project" Height="450" Width="800"
+        Title="RGB.NET Device Layout Editor" Height="450" Width="800"
         xmlns:s="https://github.com/canton7/Stylet"
         d:DataContext="{d:DesignInstance local:ShellViewModel}">
     <ContentControl s:View.Model="{Binding ActiveItem}"/>
