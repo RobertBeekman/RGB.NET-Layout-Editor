@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="LayoutEditor.UI.Controls.DeviceLayoutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:LayoutEditor.UI.Controls"
+             xmlns:s="https://github.com/canton7/Stylet"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance local:DeviceLayoutViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" ClipToBounds="True" MouseMove="{s:Action Pan}">
+            <Grid RenderTransformOrigin="0.5,0.5"
+                  MouseWheel="{s:Action ChangeZoomLevel}"
+                  Width="{Binding DeviceLayout.Width}"
+                  Height="{Binding DeviceLayout.Height}">
+                <Grid.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}" />
+                        <TranslateTransform X="{Binding PanX}" Y="{Binding PanY}" />
+                    </TransformGroup>
+                </Grid.RenderTransform>
+                <Image Source="{Binding EditorViewModel.DeviceImagePath}" />
+                <ItemsControl ItemsSource="{Binding LedViewModels}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentControl Width="{Binding Width}" Height="{Binding Height}" s:View.Model="{Binding}" ToolTip="{Binding Tooltip}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1" BorderBrush="#acacac" BorderThickness="1 0 0 0" Margin="5 0 0 0">
+            <Grid Margin="5,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Content="Click a LED to start editing it" />
+
+                <Button Content="Add LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                <Button Content="Remove LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

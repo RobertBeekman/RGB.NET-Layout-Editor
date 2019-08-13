@@ -27,14 +27,12 @@ namespace LayoutEditor.UI.Pages
             });
         }
 
-        public async void LoadFromRgbNet()
+        public void LoadFromRgbNet()
         {
-            // await Task.Run(() => { return DeviceLayout = DeviceLayout.Load(""); });
         }
 
-        public async void CreateNew()
+        public void CreateNew()
         {
-            // await Task.Run(() => { return DeviceLayout = DeviceLayout.Load(""); });
         }
     }
 }
