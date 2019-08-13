@@ -31,6 +31,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="100" />
@@ -61,7 +63,24 @@
         <ComboBox ItemsSource="{Binding Source={StaticResource LightingTypeDataProvider}}" SelectedValue="{Binding DeviceLayout.Lighting}" VerticalAlignment="Top" Grid.Column="3" Grid.Row="4" />
 
         <Label Content="Device image" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="5" />
-        <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.DeviceImage}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" />
+        <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceImagePath}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" Margin="0,0,24,0" />
         <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Right" Command="{s:Action SelectDeviceImage}">...</Button>
+
+        <Label Content="Image layout" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="6" />
+        <ComboBox ItemsSource="{Binding ImageLayouts}" SelectedValue="{Binding SelectedImageLayout}" VerticalAlignment="Top" Grid.Column="1" Grid.Row="6" Margin="0,0,30,0" />
+        <Button Height="22" Width="25" VerticalAlignment="Top" Grid.Column="1" Grid.Row="6" HorizontalAlignment="Right" Command="{s:Action AddImageLayout}">+</Button>
+        <Label Content="Default LED size" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="2" Grid.Row="6" />
+        <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="6">
+            <xctk:IntegerUpDown Height="23" Width="50" Value="{Binding DeviceLayout.LedUnitWidth}" VerticalAlignment="Top" />
+            <Label Content="X" Height="22" Margin="15, 0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+            <xctk:IntegerUpDown Height="23" Width="50" Value="{Binding DeviceLayout.LedUnitHeight}" VerticalAlignment="Top" />
+        </StackPanel>
+
+        <ContentControl Width="{Binding DeviceLayout.Width}" 
+                        Height="{Binding DeviceLayout.Height}" 
+                        s:View.Model="{Binding DeviceLayoutViewModel}"
+                        Grid.Column="0" 
+                        Grid.Row="7" 
+                        Grid.ColumnSpan="4"/>
     </Grid>
 </UserControl>
