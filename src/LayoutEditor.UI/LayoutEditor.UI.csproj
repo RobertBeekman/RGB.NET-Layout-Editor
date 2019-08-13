@@ -92,7 +92,14 @@
     <Compile Include="Bootstrapper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\DeviceLayoutView.xaml.cs">
+      <DependentUpon>DeviceLayoutView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\DeviceLayoutViewModel.cs" />
+    <Compile Include="Controls\LedView.xaml.cs">
+      <DependentUpon>LedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LedViewModel.cs" />
     <Compile Include="Dialogs\AddImageLayoutView.xaml.cs">
       <DependentUpon>AddImageLayoutView.xaml</DependentUpon>
     </Compile>
@@ -136,6 +143,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\DeviceLayoutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\LedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\AddImageLayoutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

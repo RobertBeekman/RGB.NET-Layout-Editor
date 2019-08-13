@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
+using LayoutEditor.UI.Controls;
 using LayoutEditor.UI.Dialogs;
 using Microsoft.Win32;
 using RGB.NET.Core.Layout;
@@ -30,12 +31,14 @@ namespace LayoutEditor.UI.Pages
 
             SelectedImageLayout = ImageLayouts.FirstOrDefault();
             DeviceImagePath = Path.Combine(_layoutDirectory, DeviceLayout.DeviceImage);
+            DeviceLayoutViewModel = new DeviceLayoutViewModel(DeviceLayout, this);
         }
 
         public DeviceLayout DeviceLayout { get; }
         public ObservableCollection<string> ImageLayouts { get; set; }
         public string SelectedImageLayout { get; set; }
         public string DeviceImagePath { get; set; }
+        public DeviceLayoutViewModel DeviceLayoutViewModel { get; set; }
 
         public void AddImageLayout()
         {
