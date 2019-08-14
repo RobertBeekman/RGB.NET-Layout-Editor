@@ -38,6 +38,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
     <Reference Include="PropertyChanged, Version=3.0.1.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
       <HintPath>..\packages\PropertyChanged.Fody.3.0.1\lib\net452\PropertyChanged.dll</HintPath>
     </Reference>
@@ -92,29 +98,12 @@
     <Compile Include="Bootstrapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\DeviceLayoutView.xaml.cs">
-      <DependentUpon>DeviceLayoutView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\DeviceLayoutViewModel.cs" />
-    <Compile Include="Controls\LedView.xaml.cs">
-      <DependentUpon>LedView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controls\LedViewModel.cs" />
-    <Compile Include="Dialogs\AddImageLayoutView.xaml.cs">
-      <DependentUpon>AddImageLayoutView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\AddImageLayoutViewModel.cs" />
-    <Compile Include="Pages\DeviceLayoutEditorView.xaml.cs">
-      <DependentUpon>DeviceLayoutEditorView.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Models\LayoutEditModel.cs" />
     <Compile Include="Pages\DeviceLayoutEditorViewModel.cs" />
-    <Compile Include="Pages\LandingView.xaml.cs">
-      <DependentUpon>LandingView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\LandingViewModel.cs" />
-    <Compile Include="Pages\ShellView.xaml.cs">
-      <DependentUpon>ShellView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\ShellViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

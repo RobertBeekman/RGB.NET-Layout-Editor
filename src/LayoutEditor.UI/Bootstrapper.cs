@@ -1,7 +1,6 @@
-﻿using System;
+﻿using LayoutEditor.UI.Pages;
 using Stylet;
 using StyletIoC;
-using LayoutEditor.UI.Pages;
 
 namespace LayoutEditor.UI
 {

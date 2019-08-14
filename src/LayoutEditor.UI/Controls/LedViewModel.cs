@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using LayoutEditor.UI.Models;
 using RGB.NET.Core.Layout;
 using Stylet;
 
@@ -8,18 +8,18 @@ namespace LayoutEditor.UI.Controls
     {
         private LedImage _ledImage;
 
-        public LedViewModel(LedLayout ledLayout)
+        public LedViewModel(LayoutEditModel model, LedLayout ledLayout)
         {
+            Model = model;
             LedLayout = ledLayout;
             Update();
-
-            PropertyChanged += OnPropertyChanged;
         }
-        
+
+        public LayoutEditModel Model { get; }
         public LedLayout LedLayout { get; }
 
         public string Tooltip { get; set; }
-        public string ImagePath { get; set; }
+        public string LedImagePath => Model.GetAbsoluteImageDirectory(_ledImage?.Image);
 
         public double X { get; set; }
         public double Y { get; set; }
@@ -39,13 +39,7 @@ namespace LayoutEditor.UI.Controls
         public void UpdateLedImage(LedImage ledImage)
         {
             _ledImage = ledImage;
-            ImagePath = ledImage.Image;
-        }
-
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ImagePath))
-                _ledImage.Image = ImagePath;
+            NotifyOfPropertyChange(() => LedImagePath);
         }
     }
 }
