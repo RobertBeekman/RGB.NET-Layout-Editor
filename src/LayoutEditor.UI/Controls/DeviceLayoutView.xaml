@@ -26,7 +26,8 @@
                         <TranslateTransform X="{Binding PanX}" Y="{Binding PanY}" />
                     </TransformGroup>
                 </Grid.RenderTransform>
-                <Image Source="{Binding EditorViewModel.DeviceImagePath}" />
+                <Rectangle Fill="DarkGray"></Rectangle>
+                <Image Source="{Binding EditorViewModel.DeviceImagePath}" Stretch="Fill"/>
                 <ItemsControl ItemsSource="{Binding LedViewModels}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -41,7 +42,7 @@
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <ContentControl Width="{Binding Width}" Height="{Binding Height}" s:View.Model="{Binding}" ToolTip="{Binding Tooltip}" />
+                            <ContentControl Width="{Binding Width}" Height="{Binding Height}" ToolTip="{Binding Tooltip}" s:View.Model="{Binding}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

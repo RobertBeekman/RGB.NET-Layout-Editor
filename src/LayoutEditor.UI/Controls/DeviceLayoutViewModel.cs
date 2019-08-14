@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using LayoutEditor.UI.Models;
 using LayoutEditor.UI.Pages;
 using RGB.NET.Core.Layout;
@@ -20,7 +21,7 @@ namespace LayoutEditor.UI.Controls
             DeviceLayout = model.DeviceLayout;
             EditorViewModel = editorViewModel;
 
-            LedViewModels = new BindableCollection<LedViewModel>(DeviceLayout.Leds.Select(l => new LedViewModel(Model, l)));
+            LedViewModels = new BindableCollection<LedViewModel>(DeviceLayout.Leds.Select(l => new LedViewModel(Model, this, l)));
             UpdateLedImages();
 
             EditorViewModel.PropertyChanged += EditorViewModelOnPropertyChanged;
@@ -34,6 +35,8 @@ namespace LayoutEditor.UI.Controls
         public double Zoom { get; set; } = 1;
         public double PanX { get; set; } = 1;
         public double PanY { get; set; } = 1;
+
+        public LedViewModel SelectedLed { get; set; }
 
         private void EditorViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -84,12 +87,32 @@ namespace LayoutEditor.UI.Controls
             _lastPanPosition = position;
         }
 
+        public void SelectLed(LedViewModel ledViewModel)
+        {
+            if (SelectedLed != null)
+            {
+                SelectedLed.Selected = false;
+                SelectedLed.ChangeColor(Colors.Red);
+            }
+
+            SelectedLed = ledViewModel;
+            SelectedLed.Selected = true;
+            SelectedLed.ChangeColor(Colors.Yellow);
+        }
+
         public void AddLed()
         {
+            // TODO: Figure out what defaults to populate
+            var ledLayout = new LedLayout();
+            
+            var ledViewModel = new LedViewModel(Model, this, ledLayout);
+            LedViewModels.Add(ledViewModel);
+            SelectedLed = ledViewModel;
         }
 
         public void RemoveLed()
         {
+            SelectedLed = null;
         }
     }
 }
