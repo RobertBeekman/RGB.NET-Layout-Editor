@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.Win32;
+﻿using LayoutEditor.UI.Models;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using RGB.NET.Core.Layout;
 using Stylet;
 
@@ -15,16 +14,28 @@ namespace LayoutEditor.UI.Pages
             _shellViewModel = shellViewModel;
         }
 
-        public async void LoadFromXml()
+        public void LoadFromXml()
         {
-            await Task.Run(() =>
-            {
-                var dialog = new OpenFileDialog {CheckFileExists = true, Filter = "Layout Files(*.XML)|*.XML"};
-                dialog.ShowDialog();
+            var model = new LayoutEditModel();
 
-                var deviceLayout = DeviceLayout.Load(dialog.FileName);
-                _shellViewModel.ShowDeviceLayoutEditor(deviceLayout, Path.GetDirectoryName(dialog.FileName));
-            });
+            // Select a base path
+            var folderDialog = new CommonOpenFileDialog {InitialDirectory = "C:\\Users", IsFolderPicker = true};
+            if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                model.BasePath = folderDialog.FileName;
+            else
+                return;
+
+            // Select a XML file
+            var fileDialog = new CommonOpenFileDialog {InitialDirectory = model.BasePath, Filters = {new CommonFileDialogFilter("Layout Files", "*.xml")}};
+            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                model.DeviceLayout = DeviceLayout.Load(fileDialog.FileName);
+                model.DeviceLayoutSource = fileDialog.FileName;
+            }
+            else
+                return;
+
+            _shellViewModel.ShowDeviceLayoutEditor(model);
         }
 
         public void LoadFromRgbNet()

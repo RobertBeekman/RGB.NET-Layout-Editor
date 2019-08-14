@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using LayoutEditor.UI.Models;
 using LayoutEditor.UI.Pages;
 using RGB.NET.Core.Layout;
 using Stylet;
@@ -12,13 +14,31 @@ namespace LayoutEditor.UI.Controls
     {
         private Point? _lastPanPosition;
 
-        public DeviceLayoutViewModel(DeviceLayout deviceLayout, DeviceLayoutEditorViewModel editorViewModel)
+        public DeviceLayoutViewModel(LayoutEditModel model, DeviceLayoutEditorViewModel editorViewModel)
         {
-            DeviceLayout = deviceLayout;
+            Model = model;
+            DeviceLayout = model.DeviceLayout;
             EditorViewModel = editorViewModel;
-            
-            LedViewModels = new BindableCollection<LedViewModel>(DeviceLayout.Leds.Select(l => new LedViewModel(l)));
+
+            LedViewModels = new BindableCollection<LedViewModel>(DeviceLayout.Leds.Select(l => new LedViewModel(Model, l)));
             UpdateLedImages();
+
+            EditorViewModel.PropertyChanged += EditorViewModelOnPropertyChanged;
+        }
+
+        public LayoutEditModel Model { get; }
+        public DeviceLayout DeviceLayout { get; }
+        public DeviceLayoutEditorViewModel EditorViewModel { get; }
+        public IObservableCollection<LedViewModel> LedViewModels { get; set; }
+
+        public double Zoom { get; set; } = 1;
+        public double PanX { get; set; } = 1;
+        public double PanY { get; set; } = 1;
+
+        private void EditorViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(EditorViewModel.ImageBasePath) || e.PropertyName == nameof(EditorViewModel.SelectedImageLayout))
+                UpdateLedImages();
         }
 
         public void UpdateLedImages()
@@ -34,14 +54,6 @@ namespace LayoutEditor.UI.Controls
                 ledViewModel.UpdateLedImage(ledImage);
             }
         }
-
-        public DeviceLayout DeviceLayout { get; }
-        public DeviceLayoutEditorViewModel EditorViewModel { get; }
-        public IObservableCollection<LedViewModel> LedViewModels { get; set; }
-
-        public double Zoom { get; set; } = 1;
-        public double PanX { get; set; } = 1;
-        public double PanY { get; set; } = 1;
 
         public void ChangeZoomLevel(object sender, MouseWheelEventArgs e)
         {
@@ -74,12 +86,10 @@ namespace LayoutEditor.UI.Controls
 
         public void AddLed()
         {
-
         }
 
         public void RemoveLed()
         {
-
         }
     }
 }

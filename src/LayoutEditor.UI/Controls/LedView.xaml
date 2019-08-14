@@ -5,6 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LayoutEditor.UI.Controls"
              mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance local:LedViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Rectangle StrokeThickness="1" Stroke="Red" Fill="#3FFF0000" />
+    <Grid>
+        <Image Source="{Binding LedImagePath}" />
+        <Rectangle StrokeThickness="1" Stroke="Red" Fill="#3FFF0000" />
+    </Grid>
+
 </UserControl>

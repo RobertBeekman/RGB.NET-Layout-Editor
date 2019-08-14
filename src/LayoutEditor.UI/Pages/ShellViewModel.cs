@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using RGB.NET.Core.Layout;
+using LayoutEditor.UI.Models;
 using Stylet;
 
 namespace LayoutEditor.UI.Pages
@@ -15,9 +15,9 @@ namespace LayoutEditor.UI.Pages
             ActiveItem = Items.First();
         }
 
-        public void ShowDeviceLayoutEditor(DeviceLayout deviceLayout, string layoutDirectory)
+        public void ShowDeviceLayoutEditor(LayoutEditModel model)
         {
-            var vm = new DeviceLayoutEditorViewModel(deviceLayout, layoutDirectory, _windowManager);
+            var vm = new DeviceLayoutEditorViewModel(model, _windowManager);
             Items.Add(vm);
             ActiveItem = vm;
         }
