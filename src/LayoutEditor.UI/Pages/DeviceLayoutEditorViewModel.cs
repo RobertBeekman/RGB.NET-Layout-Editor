@@ -46,7 +46,7 @@ namespace LayoutEditor.UI.Pages
 
         public string ImageBasePath { get; set; }
         public string DeviceImage { get; set; }
-        public string DeviceImagePath => Model.GetAbsoluteImageDirectory(DeviceImage);
+        public string DeviceImagePath => Model.GetAbsoluteImageDirectory(DeviceImage) ?? "None";
 
         public void SelectImageBasePath()
         {
@@ -62,8 +62,9 @@ namespace LayoutEditor.UI.Pages
             }
 
             var relativePath = folderDialog.FileName.Substring(Model.BasePath.Length + 1, folderDialog.FileName.Length - Model.BasePath.Length - 1);
-            ImageBasePath = relativePath;
             DeviceLayout.ImageBasePath = relativePath;
+            ImageBasePath = relativePath;
+            NotifyOfPropertyChange(() => DeviceImagePath);
         }
 
         public void SelectDeviceImage()
@@ -81,8 +82,9 @@ namespace LayoutEditor.UI.Pages
             }
 
             var relativePath = fileDialog.FileName.Substring(imageBasePath.Length + 1, fileDialog.FileName.Length - imageBasePath.Length - 1);
-            DeviceImage = relativePath;
             DeviceLayout.DeviceImage = relativePath;
+            DeviceImage = relativePath;
+            NotifyOfPropertyChange(() => DeviceImagePath);
         }
 
         public void AddImageLayout()
