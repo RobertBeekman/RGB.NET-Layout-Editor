@@ -92,19 +92,6 @@ namespace LayoutEditor.UI.Pages
             _windowManager.ShowDialog(new AddImageLayoutViewModel(_windowManager, this));
         }
 
-        public void UpdateLedPositions()
-        {
-            if (DeviceLayout.Leds == null)
-                return;
-
-            LedLayout lastLed = null;
-            foreach (var led in DeviceLayout.Leds)
-            {
-                led.CalculateValues(DeviceLayout, lastLed);
-                lastLed = led;
-            }
-        }
-
         public void Save()
         {
             var dialog = new SaveFileDialog {Filter = "Layout Files(*.XML)|*.XML"};
