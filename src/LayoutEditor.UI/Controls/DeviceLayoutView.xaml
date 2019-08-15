@@ -44,13 +44,13 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter Property="Canvas.Left" Value="{Binding X}" />
-                            <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                            <Setter Property="Canvas.Left" Value="{Binding LedLayout.X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding LedLayout.Y}" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <ContentControl Width="{Binding Width}" Height="{Binding Height}" ToolTip="{Binding Tooltip}" s:View.Model="{Binding}" />
+                            <ContentControl Width="{Binding LedLayout.Width}" Height="{Binding LedLayout.Height}" ToolTip="{Binding LedLayout.Id}" s:View.Model="{Binding}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -71,11 +71,13 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Label Content="Click a LED to start editing it" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" />
 
                 <Label Content="LED ID" Grid.Row="1" Grid.Column="0" />
-                <ComboBox ItemsSource="{Binding AvailableLedIds}" SelectedValue="{Binding SelectedLed.InputId}" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" />
+                <ComboBox ItemsSource="{Binding SelectedLed.AvailableLedIds}" SelectedValue="{Binding SelectedLed.InputId}" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" />
 
                 <Label Content="Shape" Grid.Row="2" Grid.Column="0" />
                 <ComboBox ItemsSource="{Binding Source={StaticResource ShapeDataProvider}}" SelectedValue="{Binding SelectedLed.InputShape}" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1" />
@@ -84,16 +86,18 @@
                 <TextBox Height="23" Text="{Binding SelectedLed.InputX}" VerticalAlignment="Top" Grid.Row="3" Grid.Column="1" />
 
                 <Label Content="Y" Grid.Row="4" Grid.Column="0" />
-                <xctk:IntegerUpDown Height="23" Value="{Binding SelectedLed.InputY}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" />
+                <TextBox Height="23" Text="{Binding SelectedLed.InputY}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" />
 
                 <Label Content="Width" Grid.Row="5" Grid.Column="0" />
-                <xctk:IntegerUpDown Height="23" Value="{Binding SelectedLed.InputWidth}" VerticalAlignment="Top" Grid.Row="5" Grid.Column="1" />
+                <TextBox Height="23" Text="{Binding SelectedLed.InputWidth}" VerticalAlignment="Top" Grid.Row="5" Grid.Column="1" />
 
                 <Label Content="Height" Grid.Row="6" Grid.Column="0" />
-                <xctk:IntegerUpDown Height="23" Value="{Binding SelectedLed.InputHeight}" VerticalAlignment="Top" Grid.Row="6" Grid.Column="1" />
+                <TextBox Height="23" Text="{Binding SelectedLed.InputHeight}" VerticalAlignment="Top" Grid.Row="6" Grid.Column="1" />
 
-                <!-- <Button Content="Add LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" /> -->
-                <!-- <Button Content="Remove LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" /> -->
+                <Button Command="{s:Action ApplyLed}" Content="Apply"  Grid.Row="7" Grid.Column="1" VerticalAlignment="Bottom" />
+
+                <Button Command="{s:Action AddLed}" Content="Add LED" Grid.Row="8" Grid.Column="0"  VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="70" />
+                <Button Command="{s:Action RemoveLed}" Content="Remove LED" Grid.Row="8" Grid.Column="1"  VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="70" />
             </Grid>
         </Border>
     </Grid>

@@ -74,7 +74,7 @@
         <Label Content="Default LED size" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="2" Grid.Row="6" />
         <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="6">
             <xctk:IntegerUpDown Height="23" Width="50" Value="{Binding DeviceLayout.LedUnitWidth}" VerticalAlignment="Top" />
-            <Label Content="X" Height="22" Margin="15, 0" VerticalAlignment="Top" HorizontalAlignment="Center" />
+            <Label Content="DrawX" Height="22" Margin="15, 0" VerticalAlignment="Top" HorizontalAlignment="Center" />
             <xctk:IntegerUpDown Height="23" Width="50" Value="{Binding DeviceLayout.LedUnitHeight}" VerticalAlignment="Top" />
         </StackPanel>
 

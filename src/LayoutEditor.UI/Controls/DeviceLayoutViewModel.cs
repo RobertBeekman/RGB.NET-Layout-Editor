@@ -6,10 +6,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using LayoutEditor.UI.Models;
 using LayoutEditor.UI.Pages;
-using RGB.NET.Core;
 using RGB.NET.Core.Layout;
 using Stylet;
-using Point = System.Windows.Point;
 
 namespace LayoutEditor.UI.Controls
 {
@@ -22,13 +20,9 @@ namespace LayoutEditor.UI.Controls
             Model = model;
             DeviceLayout = model.DeviceLayout;
             EditorViewModel = editorViewModel;
-
             LedViewModels = new BindableCollection<LedViewModel>(DeviceLayout.Leds.Select(l => new LedViewModel(Model, this, l)));
-            AvailableLedIds = new BindableCollection<string>();
-            PositionTypes = new BindableCollection<string> {"+", "=", "~"};
 
-            UpdateLedImages();
-            UpdateAvailableLedIds();
+            UpdateLeds();
 
             EditorViewModel.PropertyChanged += EditorViewModelOnPropertyChanged;
         }
@@ -38,40 +32,47 @@ namespace LayoutEditor.UI.Controls
         public DeviceLayout DeviceLayout { get; }
         public DeviceLayoutEditorViewModel EditorViewModel { get; }
         public BindableCollection<LedViewModel> LedViewModels { get; set; }
-        public BindableCollection<string> AvailableLedIds { get; set; }
-        public BindableCollection<string> PositionTypes { get; set; }
+        public LedViewModel SelectedLed { get; set; }
 
         public double Zoom { get; set; } = 1;
         public double PanX { get; set; } = 1;
         public double PanY { get; set; } = 1;
-
-        public LedViewModel SelectedLed { get; set; }
-
+        
         private void EditorViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(EditorViewModel.ImageBasePath) || e.PropertyName == nameof(EditorViewModel.SelectedImageLayout))
-                UpdateLedImages();
+                UpdateLeds();
         }
 
-        public void UpdateLedImages()
+        public void UpdateLedPositions()
         {
-            var imageLayout = DeviceLayout.LedImageLayouts.FirstOrDefault(l => l.Layout == EditorViewModel.SelectedImageLayout);
-            if (imageLayout == null)
+            if (DeviceLayout.Leds == null)
                 return;
 
-            foreach (var ledViewModel in LedViewModels)
+            LedLayout lastLed = null;
+            foreach (var led in DeviceLayout.Leds)
             {
-                // Try to find a matching LED image layout
-                var ledImage = imageLayout.LedImages.FirstOrDefault(i => i.Id == ledViewModel.LedLayout.Id);
-                ledViewModel.UpdateLedImage(ledImage);
+                led.CalculateValues(DeviceLayout, lastLed);
+                lastLed = led;
             }
         }
 
-        public void UpdateAvailableLedIds()
+
+        public void UpdateLeds()
         {
-            var ledIds = Enum.GetValues(typeof(LedId)).Cast<LedId>().Select(v => v.ToString()).ToList();
-            AvailableLedIds.Clear();
-            AvailableLedIds.AddRange(ledIds.Except(DeviceLayout.Leds.Select(l => l.Id)));
+            UpdateLedPositions();
+
+            var imageLayout = DeviceLayout.LedImageLayouts.FirstOrDefault(l => l.Layout == EditorViewModel.SelectedImageLayout);
+            foreach (var ledViewModel in LedViewModels)
+            {
+                ledViewModel.CreateLedGeometry();
+                if (imageLayout != null)
+                {
+                    // Try to find a matching LED image layout
+                    var ledImage = imageLayout.LedImages.FirstOrDefault(i => i.Id == ledViewModel.LedLayout.Id);
+                    ledViewModel.UpdateLedImage(ledImage);
+                }
+            }
         }
 
         public void ChangeZoomLevel(object sender, MouseWheelEventArgs e)
@@ -114,6 +115,11 @@ namespace LayoutEditor.UI.Controls
             SelectedLed = ledViewModel;
             SelectedLed.Selected = true;
             SelectedLed.ChangeColor(Colors.Yellow);
+        }
+
+        public void ApplyLed()
+        {
+            SelectedLed.ApplyInput();
         }
 
         public void AddLed()
