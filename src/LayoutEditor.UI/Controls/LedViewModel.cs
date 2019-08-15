@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using LayoutEditor.UI.Models;
@@ -68,7 +69,6 @@ namespace LayoutEditor.UI.Controls
                     throw new ArgumentOutOfRangeException();
             }
 
-            // TODO: Does the stroke go inward? It should.
             var drawing = new GeometryDrawing(null, new Pen(null, 2), geometry);
             
             // The pen needs some adjustments when drawing custom shapes, a thickness of 2 just means you get a very thick pen that covers the
