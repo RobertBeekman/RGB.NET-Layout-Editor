@@ -5,10 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LayoutEditor.UI.Controls"
              xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:rgbCore="clr-namespace:RGB.NET.Core;assembly=RGB.NET.Core"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance local:DeviceLayoutViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="ShapeDataProvider" MethodName="GetValues" ObjectType="{x:Type rgbCore:Shape}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="rgbCore:Shape" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -26,8 +34,8 @@
                         <TranslateTransform X="{Binding PanX}" Y="{Binding PanY}" />
                     </TransformGroup>
                 </Grid.RenderTransform>
-                <Rectangle Fill="DarkGray"></Rectangle>
-                <Image Source="{Binding EditorViewModel.DeviceImagePath}" Stretch="Fill"/>
+                <Rectangle Fill="DarkGray" />
+                <Image Source="{Binding EditorViewModel.DeviceImagePath}" Stretch="Fill" />
                 <ItemsControl ItemsSource="{Binding LedViewModels}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -51,14 +59,41 @@
 
         <Border Grid.Column="1" BorderBrush="#acacac" BorderThickness="1 0 0 0" Margin="5 0 0 0">
             <Grid Margin="5,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Label Content="Click a LED to start editing it" />
+                <Label Content="Click a LED to start editing it" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" />
 
-                <Button Content="Add LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" />
-                <Button Content="Remove LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
+                <Label Content="LED ID" Grid.Row="1" Grid.Column="0" />
+                <ComboBox ItemsSource="{Binding AvailableLedIds}" SelectedValue="{Binding SelectedLed.InputId}" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" />
+
+                <Label Content="Shape" Grid.Row="2" Grid.Column="0" />
+                <ComboBox ItemsSource="{Binding Source={StaticResource ShapeDataProvider}}" SelectedValue="{Binding SelectedLed.InputShape}" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1" />
+
+                <Label Content="X" Grid.Row="3" Grid.Column="0" />
+                <TextBox Height="23" Text="{Binding SelectedLed.InputX}" VerticalAlignment="Top" Grid.Row="3" Grid.Column="1" />
+
+                <Label Content="Y" Grid.Row="4" Grid.Column="0" />
+                <xctk:IntegerUpDown Height="23" Value="{Binding SelectedLed.InputY}" VerticalAlignment="Top" Grid.Row="4" Grid.Column="1" />
+
+                <Label Content="Width" Grid.Row="5" Grid.Column="0" />
+                <xctk:IntegerUpDown Height="23" Value="{Binding SelectedLed.InputWidth}" VerticalAlignment="Top" Grid.Row="5" Grid.Column="1" />
+
+                <Label Content="Height" Grid.Row="6" Grid.Column="0" />
+                <xctk:IntegerUpDown Height="23" Value="{Binding SelectedLed.InputHeight}" VerticalAlignment="Top" Grid.Row="6" Grid.Column="1" />
+
+                <!-- <Button Content="Add LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" /> -->
+                <!-- <Button Content="Remove LED" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" /> -->
             </Grid>
         </Border>
     </Grid>

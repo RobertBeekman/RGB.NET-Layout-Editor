@@ -6,8 +6,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using LayoutEditor.UI.Models;
 using LayoutEditor.UI.Pages;
+using RGB.NET.Core;
 using RGB.NET.Core.Layout;
 using Stylet;
+using Point = System.Windows.Point;
 
 namespace LayoutEditor.UI.Controls
 {
@@ -22,15 +24,22 @@ namespace LayoutEditor.UI.Controls
             EditorViewModel = editorViewModel;
 
             LedViewModels = new BindableCollection<LedViewModel>(DeviceLayout.Leds.Select(l => new LedViewModel(Model, this, l)));
+            AvailableLedIds = new BindableCollection<string>();
+            PositionTypes = new BindableCollection<string> {"+", "=", "~"};
+
             UpdateLedImages();
+            UpdateAvailableLedIds();
 
             EditorViewModel.PropertyChanged += EditorViewModelOnPropertyChanged;
         }
 
+
         public LayoutEditModel Model { get; }
         public DeviceLayout DeviceLayout { get; }
         public DeviceLayoutEditorViewModel EditorViewModel { get; }
-        public IObservableCollection<LedViewModel> LedViewModels { get; set; }
+        public BindableCollection<LedViewModel> LedViewModels { get; set; }
+        public BindableCollection<string> AvailableLedIds { get; set; }
+        public BindableCollection<string> PositionTypes { get; set; }
 
         public double Zoom { get; set; } = 1;
         public double PanX { get; set; } = 1;
@@ -56,6 +65,13 @@ namespace LayoutEditor.UI.Controls
                 var ledImage = imageLayout.LedImages.FirstOrDefault(i => i.Id == ledViewModel.LedLayout.Id);
                 ledViewModel.UpdateLedImage(ledImage);
             }
+        }
+
+        public void UpdateAvailableLedIds()
+        {
+            var ledIds = Enum.GetValues(typeof(LedId)).Cast<LedId>().Select(v => v.ToString()).ToList();
+            AvailableLedIds.Clear();
+            AvailableLedIds.AddRange(ledIds.Except(DeviceLayout.Leds.Select(l => l.Id)));
         }
 
         public void ChangeZoomLevel(object sender, MouseWheelEventArgs e)
@@ -104,7 +120,7 @@ namespace LayoutEditor.UI.Controls
         {
             // TODO: Figure out what defaults to populate
             var ledLayout = new LedLayout();
-            
+
             var ledViewModel = new LedViewModel(Model, this, ledLayout);
             LedViewModels.Add(ledViewModel);
             SelectedLed = ledViewModel;
