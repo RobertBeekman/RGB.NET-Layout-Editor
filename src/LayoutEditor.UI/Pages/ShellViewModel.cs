@@ -1,25 +1,26 @@
-﻿using System.Linq;
-using LayoutEditor.UI.Models;
+﻿using LayoutEditor.UI.Models;
 using Stylet;
 
 namespace LayoutEditor.UI.Pages
 {
-    public class ShellViewModel : Conductor<Screen>.Collection.OneActive
+    public class ShellViewModel : Conductor<Screen>
     {
         private readonly IWindowManager _windowManager;
 
         public ShellViewModel(IWindowManager windowManager)
         {
             _windowManager = windowManager;
-            Items.Add(new LandingViewModel(this));
-            ActiveItem = Items.First();
+            ActiveItem = new LandingViewModel(this, _windowManager);
         }
 
-        public void ShowDeviceLayoutEditor(LayoutEditModel model)
+        public void Start(LayoutEditModel model)
         {
-            var vm = new DeviceLayoutEditorViewModel(model, _windowManager);
-            Items.Add(vm);
-            ActiveItem = vm;
+            ActiveItem = new DeviceLayoutEditorViewModel(model, this, _windowManager);
+        }
+
+        public void Reset()
+        {
+            ActiveItem = new LandingViewModel(this, _windowManager);
         }
     }
 }
