@@ -158,9 +158,12 @@ namespace LayoutEditor.UI.Controls
                 case Shape.Custom:
                     try
                     {
-                        geometry = Geometry.Parse(LedLayout.ShapeData);
-                        // Get the scale in comparison to the relative rect, this determines the thickness of the stroke
-                        scale = geometry.Bounds.Width / relativeRectangle.Width;
+                        geometry = Geometry.Combine(
+                            Geometry.Empty,
+                            Geometry.Parse(LedLayout.ShapeData),
+                            GeometryCombineMode.Union,
+                            new ScaleTransform(LedLayout.Width, LedLayout.Height)
+                        );
                     }
                     catch (Exception e)
                     {
@@ -182,8 +185,8 @@ namespace LayoutEditor.UI.Controls
             var drawing = new GeometryDrawing(null, new Pen(null, 1), geometry);
 
             // Apply the previously determined scale
-            if (LedLayout.Shape == Shape.Custom)
-                drawing.Pen.Thickness = scale;
+//            if (LedLayout.Shape == Shape.Custom)
+//                drawing.Pen.Thickness = scale;
 
             DisplayDrawing = new DrawingImage(drawing);
             ChangeColor(Selected ? Colors.Yellow : Colors.Red);

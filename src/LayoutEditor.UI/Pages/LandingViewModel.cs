@@ -50,6 +50,20 @@ namespace LayoutEditor.UI.Pages
 
         public void CreateNew()
         {
+            var model = new LayoutEditModel();
+
+            _windowManager.ShowMessageBox("Select the base folder of the layout. All other paths will be relative to this folder.");
+
+            // Select a base path
+            var folderDialog = new CommonOpenFileDialog { IsFolderPicker = true };
+            if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                model.BasePath = folderDialog.FileName;
+            else
+                return;
+
+            model.DeviceLayout = new DeviceLayout();
+            
+            _shellViewModel.Start(model);
         }
     }
 }
