@@ -151,7 +151,6 @@ namespace LayoutEditor.UI.Controls
         private void CreateLedGeometry()
         {
             var relativeRectangle = new Rect(0, 0, LedLayout.Width, LedLayout.Height);
-            var scale = 1.0;
             Geometry geometry;
             switch (LedLayout.Shape)
             {
@@ -183,10 +182,6 @@ namespace LayoutEditor.UI.Controls
             }
 
             var drawing = new GeometryDrawing(null, new Pen(null, 1), geometry);
-
-            // Apply the previously determined scale
-//            if (LedLayout.Shape == Shape.Custom)
-//                drawing.Pen.Thickness = scale;
 
             DisplayDrawing = new DrawingImage(drawing);
             ChangeColor(Selected ? Colors.Yellow : Colors.Red);
