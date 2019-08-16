@@ -9,8 +9,8 @@
              d:DataContext="{d:DesignInstance local:LedViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid MouseUp="{s:Action MouseUp}" MouseEnter="{s:Action MouseEnter}" MouseLeave="{s:Action MouseLeave}" Width="{Binding LedLayout.Width}" Height="{Binding LedLayout.Height}">
-        <Image Source="{Binding LedImagePath}" Stretch="Fill"/>
-        <Image Source="{Binding DisplayDrawing}" Stretch="Fill"/>
+        <Image Source="{Binding LedImagePath}" Stretch="Fill" />
+        <Image Source="{Binding DisplayDrawing}" Stretch="Fill" />
     </Grid>
 
 </UserControl>

@@ -5,7 +5,6 @@ using System.Xml.Serialization;
 using LayoutEditor.UI.Controls;
 using LayoutEditor.UI.Dialogs;
 using LayoutEditor.UI.Models;
-using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using RGB.NET.Core.Layout;
 using Stylet;
@@ -14,15 +13,17 @@ namespace LayoutEditor.UI.Pages
 {
     public class DeviceLayoutEditorViewModel : Screen
     {
+        private readonly ShellViewModel _shellViewModel;
         private readonly IWindowManager _windowManager;
 
-        public DeviceLayoutEditorViewModel(LayoutEditModel model, IWindowManager windowManager)
+        public DeviceLayoutEditorViewModel(LayoutEditModel model, ShellViewModel shellViewModel, IWindowManager windowManager)
         {
+            _shellViewModel = shellViewModel;
             _windowManager = windowManager;
 
             Model = model;
             DeviceLayout = model.DeviceLayout;
-            DeviceLayoutViewModel = new DeviceLayoutViewModel(Model, this);
+            DeviceLayoutViewModel = new DeviceLayoutViewModel(Model, this, windowManager);
 
             ImageLayouts = new ObservableCollection<string>();
             foreach (var ledImage in DeviceLayout.LedImageLayouts)
@@ -92,13 +93,19 @@ namespace LayoutEditor.UI.Pages
             _windowManager.ShowDialog(new AddImageLayoutViewModel(_windowManager, this));
         }
 
+        public void Reset()
+        {
+            _shellViewModel.Reset();
+        }
+
         public void Save()
         {
-            var dialog = new SaveFileDialog {Filter = "Layout Files(*.XML)|*.XML"};
-            dialog.ShowDialog();
+            var fileDialog = new CommonSaveFileDialog {InitialDirectory = Model.BasePath, Filters = {new CommonFileDialogFilter("Layout File", "*.xml")}};
+            if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
 
             var writer = new XmlSerializer(typeof(DeviceLayout));
-            var file = File.Create(dialog.FileName);
+            var file = File.Create(fileDialog.FileName);
             writer.Serialize(file, DeviceLayout);
             file.Close();
         }

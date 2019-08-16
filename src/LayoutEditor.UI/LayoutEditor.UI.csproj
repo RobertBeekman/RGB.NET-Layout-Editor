@@ -101,6 +101,10 @@
     <Compile Include="Controls\DeviceLayoutViewModel.cs" />
     <Compile Include="Controls\LedViewModel.cs" />
     <Compile Include="Dialogs\AddImageLayoutViewModel.cs" />
+    <Compile Include="Dialogs\AddLedView.xaml.cs">
+      <DependentUpon>AddLedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\AddLedViewModel.cs" />
     <Compile Include="Models\LayoutEditModel.cs" />
     <Compile Include="Pages\DeviceLayoutEditorViewModel.cs" />
     <Compile Include="Pages\LandingViewModel.cs" />
@@ -141,6 +145,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\AddImageLayoutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\AddLedView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
