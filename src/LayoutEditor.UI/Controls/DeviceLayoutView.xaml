@@ -11,9 +11,11 @@
              d:DataContext="{d:DesignInstance local:DeviceLayoutViewModel}"
              d:DesignHeight="650" d:DesignWidth="800">
     <UserControl.Resources>
+        <s:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <s:BoolToVisibilityConverter x:Key="BoolToInvisibilityConverter" FalseVisibility="Visible" TrueVisibility="Visible" />
         <ObjectDataProvider x:Key="ShapeDataProvider" MethodName="GetValues" ObjectType="{x:Type rgbCore:Shape}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type Type="rgbCore:Shape" />
+                <x:Type TypeName="rgbCore:Shape" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
@@ -25,7 +27,7 @@
 
         <Grid Grid.Column="0" ClipToBounds="True" MouseWheel="{s:Action ChangeZoomLevel}" MouseMove="{s:Action Pan}" Width="Auto" Height="Auto">
             <Grid.Background>
-                <ImageBrush ImageSource="/LayoutEditor.UI;component/Resources/tile.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,15,15"/>
+                <ImageBrush ImageSource="/LayoutEditor.UI;component/Resources/tile.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,15,15" />
             </Grid.Background>
             <Grid RenderTransformOrigin="0.5,0.5" Width="{Binding DeviceLayout.Width}" Height="{Binding DeviceLayout.Height}">
                 <Grid.RenderTransform>
@@ -45,6 +47,7 @@
                         <Style TargetType="ContentPresenter">
                             <Setter Property="Canvas.Left" Value="{Binding LedLayout.X}" />
                             <Setter Property="Canvas.Top" Value="{Binding LedLayout.Y}" />
+                            <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
@@ -63,6 +66,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -99,17 +103,54 @@
                 <TextBox Height="23" Text="{Binding SelectedLed.InputHeight}" VerticalAlignment="Top" Grid.Row="6" Grid.Column="1" />
 
                 <Label Content="Shape data" Grid.Row="7" Grid.Column="0" />
-                <TextBox Height="23" Margin="5 0 0 5" Text="{Binding SelectedLed.InputShapeData}" VerticalAlignment="Top" MinHeight="100" TextWrapping="Wrap" Grid.Row="8" Grid.Column="0"
+                <Button s:View.ActionTarget="{Binding SelectedLed}"
+                        Command="{s:Action StartShapeEdit}"
+                        Visibility="{Binding SelectedLed.IsEditingShape, Converter={StaticResource BoolToInvisibilityConverter}}"
+                        Content="Start shape edit"
+                        Grid.Row="7"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Margin="0 3 0 0"
+                        VerticalAlignment="Top" />
+                <Button s:View.ActionTarget="{Binding SelectedLed}"
+                        Command="{s:Action StopShapeEdit}"
+                        Visibility="{Binding SelectedLed.IsEditingShape, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Content="Stop shape edit"
+                        Grid.Row="7"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Margin="0 3 0 0"
+                        VerticalAlignment="Top" />
+
+                <Label Content="Coord. round"
+                       Grid.Row="8"
+                       Grid.Column="0"
+                       Visibility="{Binding SelectedLed.IsEditingShape, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <xctk:IntegerUpDown 
+                    Height="23"
+                    Text="{Binding SelectedLed.ShapeEditor.RoundDecimals}"
+                    VerticalAlignment="Top"
+                    Grid.Row="8"
+                    Grid.Column="1"
+                    Visibility="{Binding SelectedLed.IsEditingShape, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                <TextBox Height="23" Margin="5 0 0 5"
+                         Text="{Binding SelectedLed.InputShapeData}"
+                         VerticalAlignment="Top"
+                         MinHeight="100"
+                         TextWrapping="Wrap"
+                         Grid.Row="9"
+                         Grid.Column="0"
                          Grid.ColumnSpan="2" />
 
-                <Label Content="{Binding LedImageText}" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" />
-                <TextBox MinHeight="23" Text="{Binding SelectedLed.InputImage}" VerticalAlignment="Top" IsReadOnly="True" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,0,24,0" />
-                <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Command="{s:Action SelectLedImage}">...</Button>
+                <Label Content="{Binding LedImageText}" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" />
+                <TextBox MinHeight="23" Text="{Binding SelectedLed.InputImage}" VerticalAlignment="Top" IsReadOnly="True" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,0,24,0" />
+                <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Command="{s:Action SelectLedImage}">...</Button>
 
-                <Button Command="{s:Action ApplyLed}" Content="Apply" Grid.Row="11" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5 5 2 0" VerticalAlignment="Top" />
-                <Button Command="{s:Action RemoveLed}" Content="Remove LED" Grid.Row="11" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5 5 0 0" VerticalAlignment="Top" />
+                <Button Command="{s:Action ApplyLed}" Content="Apply" Grid.Row="12" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5 5 2 0" VerticalAlignment="Top" />
+                <Button Command="{s:Action RemoveLed}" Content="Remove LED" Grid.Row="12" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5 5 0 0" VerticalAlignment="Top" />
 
-                <ListBox Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,5,0,5" ItemsSource="{Binding LedViewModels}" SelectedItem="{Binding SelectedLed}">
+                <ListBox Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,5,0,5" ItemsSource="{Binding LedViewModels}" SelectedItem="{Binding SelectedLed}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding LedLayout.Id}" />
@@ -117,9 +158,9 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <Button Command="{s:Action AddLed}" CommandParameter="True" Content="Add LED before" Grid.Row="13" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                <Button Command="{s:Action AddLed}" CommandParameter="True" Content="Add LED before" Grid.Row="14" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                         Margin="5 0 2 0" />
-                <Button Command="{s:Action AddLed}" CommandParameter="False" Content="Add LED after" Grid.Row="13" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                <Button Command="{s:Action AddLed}" CommandParameter="False" Content="Add LED after" Grid.Row="14" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                         Margin="5 0 0 0" />
 
             </Grid>
