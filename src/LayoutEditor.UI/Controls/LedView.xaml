@@ -8,13 +8,24 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance local:LedViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-<Grid MouseUp="{s:Action MouseUp}" 
-      MouseEnter="{s:Action MouseEnter}"
-      MouseLeave="{s:Action MouseLeave}" 
-      Width="{Binding LedLayout.Width}" 
-      Height="{Binding LedLayout.Height}">
-    <Image Source="{Binding LedImagePath}" Stretch="Fill" />
-    <Image Source="{Binding DisplayDrawing}" Stretch="Fill" />
-</Grid>
+
+    <Border MouseUp="{s:Action MouseUp}"
+            MouseEnter="{s:Action MouseEnter}"
+            MouseLeave="{s:Action MouseLeave}"
+            MouseMove="{s:Action MouseMove}"
+            Width="{Binding LedLayout.Width}"
+            Height="{Binding LedLayout.Height}">
+        <Border.Background>
+            <ImageBrush AlignmentX="Center" AlignmentY="Center"
+                        Stretch="Fill"
+                        ImageSource="{Binding LedImagePath}" />
+        </Border.Background>
+        <Path Data="{Binding DisplayGeometry}"
+              Clip="{Binding Data, RelativeSource={RelativeSource Self}}"
+              Fill="{Binding FillBrush}"
+              Stroke="{Binding BorderBrush}"
+              StrokeThickness="2">            
+        </Path>
+    </Border>
 
 </UserControl>

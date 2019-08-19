@@ -52,7 +52,7 @@ namespace LayoutEditor.UI.Controls
                 if (oldSelection != null)
                 {
                     oldSelection.Selected = false;
-                    oldSelection.ChangeColor(Colors.Red);
+                    oldSelection.SetColor(Colors.Red);
                 }
 
                 SelectLed(SelectedLed);
@@ -129,14 +129,14 @@ namespace LayoutEditor.UI.Controls
             if (SelectedLed != null)
             {
                 SelectedLed.Selected = false;
-                SelectedLed.ChangeColor(Colors.Red);
+                SelectedLed.SetColor(Colors.Red);
             }
 
             if (ledViewModel != null)
             {
                 SelectedLed = ledViewModel;
                 SelectedLed.Selected = true;
-                SelectedLed.ChangeColor(Colors.Yellow);
+                SelectedLed.SetColor(Colors.Yellow);
             }
         }
 

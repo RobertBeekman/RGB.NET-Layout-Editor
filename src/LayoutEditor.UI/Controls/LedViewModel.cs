@@ -2,13 +2,16 @@
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
+using LayoutEditor.UI.Editors;
 using LayoutEditor.UI.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using RGB.NET.Core;
 using RGB.NET.Core.Layout;
 using Stylet;
 using Color = System.Windows.Media.Color;
+using Point = System.Windows.Point;
 
 namespace LayoutEditor.UI.Controls
 {
@@ -44,19 +47,23 @@ namespace LayoutEditor.UI.Controls
         public string InputWidth { get; set; }
         public string InputHeight { get; set; }
 
-        public DrawingImage DisplayDrawing { get; set; }
+        public ShapeEditor ShapeEditor { get; set; }
+        public bool IsEditingShape => ShapeEditor != null;
+        public int ZIndex => ShapeEditor != null ? 2 : 1;
+
+        public Geometry DisplayGeometry { get; set; }
+        public SolidColorBrush FillBrush { get; set; }
+        public SolidColorBrush BorderBrush { get; set; }
 
         public void ApplyInput()
         {
             // If the ID changed the image layouts must change as well
             if (!LedLayout.Id.Equals(InputId))
-            {
                 foreach (var imageLayout in Model.DeviceLayout.LedImageLayouts)
                 {
                     foreach (var ledImage in imageLayout.LedImages.Where(l => l.Id.Equals(LedLayout.Id)))
                         ledImage.Id = InputId;
                 }
-            }
 
             LedLayout.Id = InputId;
             LedLayout.DescriptiveX = InputX;
@@ -106,16 +113,14 @@ namespace LayoutEditor.UI.Controls
         public void UpdateLedImage(LedImage ledImage)
         {
             _ledImage = ledImage;
-            if (InputImage != _ledImage?.Image)
-            {
-                InputImage = _ledImage?.Image;
-                NotifyOfPropertyChange(() => LedImagePath);
-            }
+            InputImage = _ledImage?.Image;
+            NotifyOfPropertyChange(() => LedImagePath);
         }
 
         public void SelectImage()
         {
-            var fileDialog = new CommonOpenFileDialog {InitialDirectory = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath), Filters = {new CommonFileDialogFilter("Image Files", "*.png")}};
+            var fileDialog = new CommonOpenFileDialog
+                {InitialDirectory = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath), Filters = {new CommonFileDialogFilter("Image Files", "*.png")}};
             if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
 
@@ -150,72 +155,126 @@ namespace LayoutEditor.UI.Controls
 
         private void CreateLedGeometry()
         {
-            var relativeRectangle = new Rect(0, 0, LedLayout.Width, LedLayout.Height);
+            var geometryRectangle = new Rect(0, 0, 1, 1);
             Geometry geometry;
-            switch (LedLayout.Shape)
-            {
-                case Shape.Custom:
-                    try
-                    {
-                        geometry = Geometry.Combine(
-                            Geometry.Empty,
-                            Geometry.Parse(LedLayout.ShapeData),
-                            GeometryCombineMode.Union,
-                            new ScaleTransform(LedLayout.Width, LedLayout.Height)
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        geometry = new RectangleGeometry(relativeRectangle);
-                        _windowManager.ShowMessageBox("Failed to parse shape data, showing a rectangle instead.\n\n " + e.Message, InputId);
-                    }
 
-                    break;
-                case Shape.Rectangle:
-                    geometry = new RectangleGeometry(relativeRectangle);
-                    break;
-                case Shape.Circle:
-                    geometry = new EllipseGeometry(relativeRectangle);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+            if (ShapeEditor != null)
+            {
+                try
+                {
+                    geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true), GeometryCombineMode.Union, null);
+                }
+                catch (Exception)
+                {
+                    geometry = ShapeEditor.GetGeometry(true);
+                }
+            }
+            else
+                switch (LedLayout.Shape)
+                {
+                    case Shape.Custom:
+                        try
+                        {
+                            geometry = Geometry.Parse(LedLayout.ShapeData);
+                        }
+                        catch (Exception e)
+                        {
+                            geometry = new RectangleGeometry(geometryRectangle);
+                            _windowManager.ShowMessageBox("Failed to parse shape data, showing a rectangle instead.\n\n " + e.Message, InputId);
+                        }
+
+                        break;
+                    case Shape.Rectangle:
+                        geometry = new RectangleGeometry(geometryRectangle);
+                        break;
+                    case Shape.Circle:
+                        geometry = new EllipseGeometry(geometryRectangle);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+            DisplayGeometry = Geometry.Combine(Geometry.Empty, geometry, GeometryCombineMode.Union, new ScaleTransform(LedLayout.Width, LedLayout.Height));
+            SetColor(Selected ? Colors.Yellow : Colors.Red);
+
+            NotifyOfPropertyChange(() => LedLayout);
+        }
+
+        public void SetColor(Color borderColor, Color? fillColor = null)
+        {
+            if (fillColor == null)
+                fillColor = Color.FromArgb(64, borderColor.R, borderColor.G, borderColor.B);
+
+            BorderBrush = new SolidColorBrush(borderColor);
+            FillBrush = new SolidColorBrush(fillColor.Value);
+        }
+
+        public void StartShapeEdit()
+        {
+            ShapeEditor = new ShapeEditor();
+//            ShapeEditor.RoundDecimals = 1;
+            CreateLedGeometry();
+            NotifyOfPropertyChange(() => IsEditingShape);
+            NotifyOfPropertyChange(() => ZIndex);
+        }
+
+        public void StopShapeEdit()
+        {
+            var geometry = ShapeEditor.GetGeometry(false);
+            if (geometry is PathGeometry)
+            {
+                InputShapeData = geometry
+                    .ToString()
+                    .Replace(",", ".")
+                    .Replace(";", ",")
+                    .Replace("L", " L");
             }
 
-            var drawing = new GeometryDrawing(null, new Pen(null, 1), geometry);
+            ShapeEditor = null;
+            CreateLedGeometry();
+            NotifyOfPropertyChange(() => IsEditingShape);
+            NotifyOfPropertyChange(() => ZIndex);
+        }
 
-            DisplayDrawing = new DrawingImage(drawing);
-            ChangeColor(Selected ? Colors.Yellow : Colors.Red);
-            NotifyOfPropertyChange(() => LedLayout);
+        private Point GetPercentagePosition(Point position)
+        {
+            return new Point(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
         }
 
         #region Event handlers
 
-        public void MouseUp()
+        public void MouseUp(object sender, MouseEventArgs e)
         {
             _layoutViewModel.SelectLed(this);
+
+            if (ShapeEditor != null)
+            {
+                var percentagePosition = GetPercentagePosition(e.GetPosition((IInputElement) sender));
+                ShapeEditor.Click(percentagePosition);
+                CreateLedGeometry();
+            }
+        }
+
+        public void MouseMove(object sender, MouseEventArgs e)
+        {
+            if (ShapeEditor != null)
+            {
+                var percentagePosition = GetPercentagePosition(e.GetPosition((IInputElement) sender));
+                ShapeEditor.Move(percentagePosition);
+                CreateLedGeometry();
+            }
         }
 
         public void MouseEnter()
         {
             if (!Selected)
-                ChangeColor(Colors.Orange);
+                SetColor(Colors.Orange);
         }
 
         public void MouseLeave()
         {
             if (!Selected)
-                ChangeColor(Colors.Red);
-        }
-
-        public void ChangeColor(Color color)
-        {
-            if (DisplayDrawing.Drawing is GeometryDrawing geometryDrawing)
-            {
-                geometryDrawing.Brush = new SolidColorBrush(color) {Opacity = 0.3};
-                geometryDrawing.Pen.Brush = new SolidColorBrush(color);
-
-                NotifyOfPropertyChange(() => DisplayDrawing);
-            }
+                SetColor(Colors.Red);
         }
 
         #endregion
