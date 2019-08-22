@@ -82,7 +82,7 @@ namespace LayoutEditor.UI.Controls
             }
 
             // Update the LEDs in the VMs
-            var imageLayout = DeviceLayout.LedImageLayouts.FirstOrDefault(l => l.Layout.Equals(EditorViewModel.SelectedImageLayout));
+            var imageLayout = DeviceLayout.LedImageLayouts?.FirstOrDefault(l => l.Layout.Equals(EditorViewModel.SelectedImageLayout));
             foreach (var ledViewModel in LedViewModels)
             {
                 ledViewModel.Update();
