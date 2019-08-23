@@ -29,14 +29,14 @@
             <Grid.Background>
                 <ImageBrush ImageSource="/LayoutEditor.UI;component/Resources/tile.png" TileMode="Tile" ViewportUnits="Absolute" Viewport="0,0,15,15" />
             </Grid.Background>
-            <Grid RenderTransformOrigin="0.5,0.5" Width="{Binding DeviceLayout.Width}" Height="{Binding DeviceLayout.Height}">
+            <Grid RenderTransformOrigin="0.5,0.5" Width="{Binding DeviceLayout.Width}" Height="{Binding DeviceLayout.Height}" MouseMove="{s:Action MoveLed}">
                 <Grid.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform ScaleX="{Binding Zoom}" ScaleY="{Binding Zoom}" />
                         <TranslateTransform X="{Binding PanX}" Y="{Binding PanY}" />
                     </TransformGroup>
                 </Grid.RenderTransform>
-                <Image Source="{Binding EditorViewModel.DeviceImagePath}" Stretch="Fill" />
+                <Image Source="{Binding EditorViewModel.DeviceImagePath}" Stretch="Fill"/>
                 <ItemsControl ItemsSource="{Binding LedViewModels}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -52,7 +52,7 @@
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <ContentControl Width="{Binding LedLayout.Width}" Height="{Binding LedLayout.Height}" ToolTip="{Binding LedLayout.Id}" s:View.Model="{Binding}" />
+                            <ContentControl Width="{Binding LedLayout.Width}" Height="{Binding LedLayout.Height}" ToolTip="{Binding LedLayout.Id}" s:View.Model="{Binding}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
