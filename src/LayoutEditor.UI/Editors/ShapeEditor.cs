@@ -30,7 +30,9 @@ namespace LayoutEditor.UI.Editors
                 return new EllipseGeometry(PendingPoint, 0.025, 0.025);
             if (Points.Count == 1)
             {
-                return new GeometryGroup() {Children = new GeometryCollection()
+                return new GeometryGroup
+                {
+                    Children = new GeometryCollection
                     {
                         new EllipseGeometry(Points.First(), 0.025, 0.025),
                         new EllipseGeometry(PendingPoint, 0.025, 0.025)
@@ -51,8 +53,8 @@ namespace LayoutEditor.UI.Editors
 
         private Point RoundPoint(Point point)
         {
-            return RoundDecimals != null 
-                ? new Point(Math.Round(point.X, RoundDecimals.Value, MidpointRounding.AwayFromZero), Math.Round(point.Y, RoundDecimals.Value, MidpointRounding.AwayFromZero)) 
+            return RoundDecimals != null
+                ? new Point(Math.Round(point.X, RoundDecimals.Value, MidpointRounding.AwayFromZero), Math.Round(point.Y, RoundDecimals.Value, MidpointRounding.AwayFromZero))
                 : point;
         }
     }

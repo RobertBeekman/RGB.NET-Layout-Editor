@@ -11,8 +11,7 @@
         <TextBlock Margin="5,75,5,5" TextAlignment="Center">
             <Run Text="Welcome to the RGB.NET layout editor. " /><LineBreak /><Run Text="Choose one of the options below to edit or create a new layout." />
         </TextBlock>
-        <Button Command="{s:Action LoadFromXml}" Content="Load from XML" Width="200" Margin="5,70,5,5" />
-        <Button Command="{s:Action LoadFromRgbNet}" Content="Load from RGB.NET" Width="200" Margin="5" />
+        <Button Command="{s:Action LoadFromXml}" Content="Load from XML" Width="200" Margin="5,70,5,5" />        
         <Button Command="{s:Action CreateNew}" Content="Create new layout" Width="200" Margin="5" />
     </StackPanel>
 </UserControl>

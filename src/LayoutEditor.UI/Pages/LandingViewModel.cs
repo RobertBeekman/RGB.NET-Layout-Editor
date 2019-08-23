@@ -1,4 +1,5 @@
-﻿using LayoutEditor.UI.Models;
+﻿using System;
+using LayoutEditor.UI.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using RGB.NET.Core.Layout;
 using Stylet;
@@ -42,10 +43,6 @@ namespace LayoutEditor.UI.Pages
                 return;
 
             _shellViewModel.Start(model);
-        }
-
-        public void LoadFromRgbNet()
-        {
         }
 
         public void CreateNew()

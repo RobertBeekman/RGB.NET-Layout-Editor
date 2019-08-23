@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -16,6 +17,7 @@ namespace LayoutEditor.UI.Controls
     {
         private readonly IWindowManager _windowManager;
         private Point? _lastPanPosition;
+        private bool _movingLed;
 
         public DeviceLayoutViewModel(LayoutEditModel model, DeviceLayoutEditorViewModel editorViewModel, IWindowManager windowManager)
         {
@@ -30,6 +32,14 @@ namespace LayoutEditor.UI.Controls
 
             PropertyChanged += DeviceLayoutViewModelPropertyChanged;
             EditorViewModel.PropertyChanged += EditorViewModelOnPropertyChanged;
+
+
+            var activeWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
+            if (activeWindow != null)
+            {
+                activeWindow.KeyDown += KeyUpDown;
+                activeWindow.KeyUp += KeyUpDown;
+            }
         }
 
         public LayoutEditModel Model { get; }
@@ -52,7 +62,7 @@ namespace LayoutEditor.UI.Controls
                 if (oldSelection != null)
                 {
                     oldSelection.Selected = false;
-                    oldSelection.SetColor(Colors.Red);
+                    oldSelection.SetColor(LedViewModel.UnselectedColor);
                 }
 
                 SelectLed(SelectedLed);
@@ -82,7 +92,7 @@ namespace LayoutEditor.UI.Controls
             }
 
             // Update the LEDs in the VMs
-            var imageLayout = DeviceLayout.LedImageLayouts?.FirstOrDefault(l => l.Layout.Equals(EditorViewModel.SelectedImageLayout));
+            var imageLayout = DeviceLayout.LedImageLayouts?.FirstOrDefault(l => l.Layout != null && l.Layout.Equals(EditorViewModel.SelectedImageLayout));
             foreach (var ledViewModel in LedViewModels)
             {
                 ledViewModel.Update();
@@ -107,6 +117,9 @@ namespace LayoutEditor.UI.Controls
 
         public void Pan(object sender, MouseEventArgs e)
         {
+            if (_movingLed)
+                return;
+
             if (e.LeftButton == MouseButtonState.Released)
             {
                 _lastPanPosition = null;
@@ -124,19 +137,49 @@ namespace LayoutEditor.UI.Controls
             _lastPanPosition = position;
         }
 
+        public void MoveLed(object sender, MouseEventArgs e)
+        {
+            if (!_movingLed || SelectedLed == null || e.LeftButton == MouseButtonState.Released)
+                return;
+
+            var position = e.GetPosition((IInputElement) sender);
+            SelectedLed.InputX = Math.Round(position.X - SelectedLed.LedLayout.Width / 2, 1).ToString(CultureInfo.InvariantCulture);
+            SelectedLed.InputY = Math.Round(position.Y - SelectedLed.LedLayout.Height / 2, 1).ToString(CultureInfo.InvariantCulture);
+            SelectedLed.ApplyInput();
+        }
+
+        public void KeyUpDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftShift)
+            {
+                _movingLed = e.IsDown;
+                Mouse.OverrideCursor = _movingLed ? Cursors.SizeAll : null;
+            }
+            else if (e.Key == Key.Escape)
+            {
+                if (SelectedLed != null)
+                {
+                    SelectedLed.Selected = false;
+                    SelectedLed.SetColor(LedViewModel.UnselectedColor);
+                    SelectedLed = null;
+                }
+            }
+        }
+
+
         public void SelectLed(LedViewModel ledViewModel)
         {
             if (SelectedLed != null)
             {
                 SelectedLed.Selected = false;
-                SelectedLed.SetColor(Colors.Red);
+                SelectedLed.SetColor(LedViewModel.UnselectedColor);
             }
 
             if (ledViewModel != null)
             {
                 SelectedLed = ledViewModel;
                 SelectedLed.Selected = true;
-                SelectedLed.SetColor(Colors.Yellow);
+                SelectedLed.SetColor(LedViewModel.SelectedColor);
             }
         }
 

@@ -17,6 +17,10 @@ namespace LayoutEditor.UI.Controls
 {
     public class LedViewModel : PropertyChangedBase
     {
+        public static Color SelectedColor = Color.FromRgb(237, 65, 131);
+        public static Color HoverColor = Color.FromRgb(116, 97, 167);
+        public static Color UnselectedColor = Color.FromRgb(62, 180, 203);
+
         private readonly DeviceLayoutViewModel _layoutViewModel;
         private readonly IWindowManager _windowManager;
         private LedImage _ledImage;
@@ -29,6 +33,7 @@ namespace LayoutEditor.UI.Controls
             Model = model;
             LedLayout = ledLayout;
             AvailableLedIds = new BindableCollection<string>();
+            LedCursor = Cursors.Hand;
         }
 
         public LayoutEditModel Model { get; }
@@ -47,6 +52,7 @@ namespace LayoutEditor.UI.Controls
         public string InputWidth { get; set; }
         public string InputHeight { get; set; }
 
+        public Cursor LedCursor { get; set; }
         public ShapeEditor ShapeEditor { get; set; }
         public bool IsEditingShape => ShapeEditor != null;
         public int ZIndex => ShapeEditor != null ? 2 : 1;
@@ -88,7 +94,7 @@ namespace LayoutEditor.UI.Controls
             {
                 var ledImage = new LedImage {Id = LedLayout.Id, Image = InputImage};
                 // Find the current layout
-                var layout = Model.DeviceLayout.LedImageLayouts.FirstOrDefault(l => l.Layout.Equals(_layoutViewModel.EditorViewModel.SelectedImageLayout));
+                var layout = Model.DeviceLayout.LedImageLayouts.FirstOrDefault(l => l.Layout != null && l.Layout.Equals(_layoutViewModel.EditorViewModel.SelectedImageLayout));
                 // If missing, create it
                 if (layout == null)
                 {
@@ -195,7 +201,7 @@ namespace LayoutEditor.UI.Controls
                 }
 
             DisplayGeometry = Geometry.Combine(Geometry.Empty, geometry, GeometryCombineMode.Union, new ScaleTransform(LedLayout.Width, LedLayout.Height));
-            SetColor(Selected ? Colors.Yellow : Colors.Red);
+            SetColor(Selected ? SelectedColor : UnselectedColor);
 
             NotifyOfPropertyChange(() => LedLayout);
         }
@@ -211,8 +217,8 @@ namespace LayoutEditor.UI.Controls
 
         public void StartShapeEdit()
         {
+            LedCursor = Cursors.Pen;
             ShapeEditor = new ShapeEditor();
-//            ShapeEditor.RoundDecimals = 1;
             CreateLedGeometry();
             NotifyOfPropertyChange(() => IsEditingShape);
             NotifyOfPropertyChange(() => ZIndex);
@@ -230,6 +236,7 @@ namespace LayoutEditor.UI.Controls
                     .Replace("L", " L");
             }
 
+            LedCursor = Cursors.Hand;
             ShapeEditor = null;
             CreateLedGeometry();
             NotifyOfPropertyChange(() => IsEditingShape);
@@ -268,13 +275,13 @@ namespace LayoutEditor.UI.Controls
         public void MouseEnter()
         {
             if (!Selected)
-                SetColor(Colors.Orange);
+                SetColor(HoverColor);
         }
 
         public void MouseLeave()
         {
             if (!Selected)
-                SetColor(Colors.Red);
+                SetColor(UnselectedColor);
         }
 
         #endregion
