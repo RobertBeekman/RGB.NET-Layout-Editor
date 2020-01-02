@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -266,7 +266,7 @@ namespace LayoutEditor.UI.Controls
 
         private void FileChangedWatcherOnFileChanged(object sender, string file)
         {
-            if (file == Path.GetFileName(LedImagePath))
+            if (Path.GetFileName(file) == Path.GetFileName(LedImagePath))
                 Application.Current?.Dispatcher?.BeginInvoke(new Action(UpdateImageSource));
         }
 

@@ -21,6 +21,7 @@ namespace LayoutEditor.UI
                 _watcher.Created += WatcherHit;
                 _watcher.Deleted += WatcherHit;
                 _watcher.Renamed += WatcherHit;
+                _watcher.IncludeSubdirectories = true;
                 _watcher.EnableRaisingEvents = true;
             }
             else
@@ -31,7 +32,7 @@ namespace LayoutEditor.UI
 
         private static void WatcherHit(object sender, FileSystemEventArgs e)
         {
-            FileChanged?.Invoke(null, e.Name);
+            FileChanged?.Invoke(null, e.FullPath);
         }
     }
 }
