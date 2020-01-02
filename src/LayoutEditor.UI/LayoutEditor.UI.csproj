@@ -107,6 +107,7 @@
     </Compile>
     <Compile Include="Dialogs\AddLedViewModel.cs" />
     <Compile Include="Editors\ShapeEditor.cs" />
+    <Compile Include="FileChangedWatcher.cs" />
     <Compile Include="Models\LayoutEditModel.cs" />
     <Compile Include="Pages\DeviceLayoutEditorViewModel.cs" />
     <Compile Include="Pages\LandingViewModel.cs" />
