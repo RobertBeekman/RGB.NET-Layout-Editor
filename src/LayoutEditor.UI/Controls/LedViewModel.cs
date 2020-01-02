@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using LayoutEditor.UI.Editors;
 using LayoutEditor.UI.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -34,11 +36,19 @@ namespace LayoutEditor.UI.Controls
             LedLayout = ledLayout;
             AvailableLedIds = new BindableCollection<string>();
             LedCursor = Cursors.Hand;
+
+            this.PropertyChanged += OnPropertyChanged;
+            FileChangedWatcher.FileChanged += FileChangedWatcherOnFileChanged;
+
+            UpdateImageSource();
         }
 
         public LayoutEditModel Model { get; }
         public LedLayout LedLayout { get; }
         public BindableCollection<string> AvailableLedIds { get; set; }
+
+        private MemoryStream _imageStream;
+        public ImageSource LedImageSource { get; set; }
 
         public string LedImagePath => Model.GetAbsoluteImageDirectory(_ledImage?.Image);
         public bool Selected { get; set; }
@@ -126,7 +136,7 @@ namespace LayoutEditor.UI.Controls
         public void SelectImage()
         {
             var fileDialog = new CommonOpenFileDialog
-                {InitialDirectory = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath), Filters = {new CommonFileDialogFilter("Image Files", "*.png")}};
+            {InitialDirectory = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath), Filters = {new CommonFileDialogFilter("Image Files", "*.png")}};
             if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
 
@@ -246,6 +256,43 @@ namespace LayoutEditor.UI.Controls
         private Point GetPercentagePosition(Point position)
         {
             return new Point(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(LedImagePath))
+                UpdateImageSource();
+        }
+
+        private void FileChangedWatcherOnFileChanged(object sender, string file)
+        {
+            if (file == Path.GetFileName(LedImagePath))
+                Application.Current?.Dispatcher?.BeginInvoke(new Action(UpdateImageSource));
+        }
+
+        private void UpdateImageSource()
+        {
+            _imageStream?.Dispose();
+
+            string filePath = LedImagePath;
+            if (filePath != null && File.Exists(filePath))
+            {
+                _imageStream = new MemoryStream(File.ReadAllBytes(filePath));
+                var bitmap = new BitmapImage();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.BeginInit();
+                bitmap.StreamSource = _imageStream;
+                bitmap.EndInit();
+
+                LedImageSource = bitmap;
+            }
+            else
+            {
+                LedImageSource = null;
+                _imageStream = null;
+            }
+
+            OnPropertyChanged(nameof(LedImageSource));
         }
 
         #region Event handlers

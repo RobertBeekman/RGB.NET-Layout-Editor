@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using LayoutEditor.UI.Dialogs;
 using LayoutEditor.UI.Models;
 using LayoutEditor.UI.Pages;
@@ -71,7 +71,13 @@ namespace LayoutEditor.UI.Controls
 
         private void EditorViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(EditorViewModel.ImageBasePath) || e.PropertyName == nameof(EditorViewModel.SelectedImageLayout))
+            if (e.PropertyName == nameof(EditorViewModel.ImageBasePath))
+            {
+                FileChangedWatcher.SetWatchDirectory(Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath));
+                NotifyOfPropertyChange(() => LedImageText);
+                UpdateLeds();
+            }
+            else if (e.PropertyName == nameof(EditorViewModel.SelectedImageLayout))
             {
                 NotifyOfPropertyChange(() => LedImageText);
                 UpdateLeds();
