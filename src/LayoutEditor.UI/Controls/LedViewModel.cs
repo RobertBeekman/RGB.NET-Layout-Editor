@@ -37,7 +37,7 @@ namespace LayoutEditor.UI.Controls
             AvailableLedIds = new BindableCollection<string>();
             LedCursor = Cursors.Hand;
 
-            this.PropertyChanged += OnPropertyChanged;
+            PropertyChanged += LedImagePathChanged;
             FileChangedWatcher.FileChanged += FileChangedWatcherOnFileChanged;
 
             UpdateImageSource();
@@ -136,7 +136,7 @@ namespace LayoutEditor.UI.Controls
         public void SelectImage()
         {
             var fileDialog = new CommonOpenFileDialog
-            {InitialDirectory = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath), Filters = {new CommonFileDialogFilter("Image Files", "*.png")}};
+                {InitialDirectory = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath), Filters = {new CommonFileDialogFilter("Image Files", "*.png")}};
             if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
 
@@ -178,7 +178,7 @@ namespace LayoutEditor.UI.Controls
             {
                 try
                 {
-                    geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true), GeometryCombineMode.Union, null);
+                    geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true), GeometryCombineMode.Xor, null);
                 }
                 catch (Exception)
                 {
@@ -232,6 +232,8 @@ namespace LayoutEditor.UI.Controls
             CreateLedGeometry();
             NotifyOfPropertyChange(() => IsEditingShape);
             NotifyOfPropertyChange(() => ZIndex);
+
+            ApplyInput();
         }
 
         public void StopShapeEdit()
@@ -239,7 +241,7 @@ namespace LayoutEditor.UI.Controls
             var geometry = ShapeEditor.GetGeometry(false);
             if (geometry is PathGeometry)
             {
-                InputShapeData = geometry
+                InputShapeData = InputShapeData + " " + geometry
                     .ToString()
                     .Replace(",", ".")
                     .Replace(";", ",")
@@ -251,6 +253,8 @@ namespace LayoutEditor.UI.Controls
             CreateLedGeometry();
             NotifyOfPropertyChange(() => IsEditingShape);
             NotifyOfPropertyChange(() => ZIndex);
+
+            ApplyInput();
         }
 
         private Point GetPercentagePosition(Point position)
@@ -258,7 +262,7 @@ namespace LayoutEditor.UI.Controls
             return new Point(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void LedImagePathChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(LedImagePath))
                 UpdateImageSource();
@@ -267,7 +271,7 @@ namespace LayoutEditor.UI.Controls
         private void FileChangedWatcherOnFileChanged(object sender, string file)
         {
             if (Path.GetFileName(file) == Path.GetFileName(LedImagePath))
-                Application.Current?.Dispatcher?.BeginInvoke(new Action(UpdateImageSource));
+                Execute.PostToUIThread(UpdateImageSource);
         }
 
         private void UpdateImageSource()
@@ -291,8 +295,6 @@ namespace LayoutEditor.UI.Controls
                 LedImageSource = null;
                 _imageStream = null;
             }
-
-            OnPropertyChanged(nameof(LedImageSource));
         }
 
         #region Event handlers
