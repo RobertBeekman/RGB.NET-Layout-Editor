@@ -16,9 +16,10 @@ An editor for [RGB.NET](https://github.com/DarthAffe/RGB.NET) layouts. Not extre
  
 
 Example layouts can be found at https://github.com/DarthAffe/RGB.NET-Resources  
-Executable of latest build: [RGB.NET_Layout_Editor_Build.zip]( https://build.rbeekman.nl/repository/downloadAll/RgbNetLayoutEditor_Build/.lastSuccessful/artifacts.zip?guest=1)
+Executable of latest build: [RGB.NET_Layout_Editor_Build.zip]( https://build.rbeekman.nl/repository/downloadAll/RgbNetLayoutEditor_Build/.lastSuccessful/artifacts.zip?guest=1)  
+To build yourself, clone and run  ```Update-Package -reinstall PropertyChanged.Fody``` on the project
 
-*\*Only one vertex supported. If you want more than one vertex, create the first vertex and stop editing, copy it, create the next vertex and paste the previous one back. Rinse and repeat.*
+*\*To create multiple paths on custom shapes, stop and start shape editing each time you want a new path.*
 
 ## Screenshots
 ![Editing a keyboard](https://i.imgur.com/BYn8HW8.png)
