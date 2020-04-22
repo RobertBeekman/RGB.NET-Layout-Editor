@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -66,6 +67,7 @@ namespace LayoutEditor.UI.Controls
         public ShapeEditor ShapeEditor { get; set; }
         public bool IsEditingShape => ShapeEditor != null;
         public int ZIndex => ShapeEditor != null ? 2 : 1;
+        public bool CanStartShapeEdit => InputShape == Shape.Custom;
 
         public Geometry DisplayGeometry { get; set; }
         public SolidColorBrush FillBrush { get; set; }
@@ -242,8 +244,7 @@ namespace LayoutEditor.UI.Controls
             if (geometry is PathGeometry)
             {
                 InputShapeData = InputShapeData + " " + geometry
-                    .ToString()
-                    .Replace(",", ".")
+                    .ToString(CultureInfo.InvariantCulture)
                     .Replace(";", ",")
                     .Replace("L", " L");
             }
