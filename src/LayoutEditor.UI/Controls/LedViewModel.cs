@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LayoutEditor.UI.Editors;
@@ -12,6 +14,8 @@ using LayoutEditor.UI.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using RGB.NET.Core;
 using RGB.NET.Core.Layout;
+using SharpVectors.Converters;
+using SharpVectors.Renderers.Wpf;
 using Stylet;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
@@ -26,6 +30,8 @@ namespace LayoutEditor.UI.Controls
 
         private readonly DeviceLayoutViewModel _layoutViewModel;
         private readonly IWindowManager _windowManager;
+
+        private MemoryStream _imageStream;
         private LedImage _ledImage;
 
         public LedViewModel(LayoutEditModel model, DeviceLayoutViewModel layoutViewModel, IWindowManager windowManager, LedLayout ledLayout)
@@ -47,8 +53,6 @@ namespace LayoutEditor.UI.Controls
         public LayoutEditModel Model { get; }
         public LedLayout LedLayout { get; }
         public BindableCollection<string> AvailableLedIds { get; set; }
-
-        private MemoryStream _imageStream;
         public ImageSource LedImageSource { get; set; }
 
         public string LedImagePath => Model.GetAbsoluteImageDirectory(_ledImage?.Image);
@@ -78,10 +82,8 @@ namespace LayoutEditor.UI.Controls
             // If the ID changed the image layouts must change as well
             if (!LedLayout.Id.Equals(InputId))
                 foreach (var imageLayout in Model.DeviceLayout.LedImageLayouts)
-                {
-                    foreach (var ledImage in imageLayout.LedImages.Where(l => l.Id.Equals(LedLayout.Id)))
-                        ledImage.Id = InputId;
-                }
+                foreach (var ledImage in imageLayout.LedImages.Where(l => l.Id.Equals(LedLayout.Id)))
+                    ledImage.Id = InputId;
 
             LedLayout.Id = InputId;
             LedLayout.DescriptiveX = InputX;
@@ -177,7 +179,6 @@ namespace LayoutEditor.UI.Controls
             Geometry geometry;
 
             if (ShapeEditor != null)
-            {
                 try
                 {
                     geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true), GeometryCombineMode.Xor, null);
@@ -186,7 +187,6 @@ namespace LayoutEditor.UI.Controls
                 {
                     geometry = ShapeEditor.GetGeometry(true);
                 }
-            }
             else
                 switch (LedLayout.Shape)
                 {
@@ -242,12 +242,10 @@ namespace LayoutEditor.UI.Controls
         {
             var geometry = ShapeEditor.GetGeometry(false);
             if (geometry is PathGeometry)
-            {
                 InputShapeData = InputShapeData + " " + geometry
                     .ToString(CultureInfo.InvariantCulture)
                     .Replace(";", ",")
                     .Replace("L", " L");
-            }
 
             LedCursor = Cursors.Hand;
             ShapeEditor = null;
@@ -256,6 +254,68 @@ namespace LayoutEditor.UI.Controls
             NotifyOfPropertyChange(() => ZIndex);
 
             ApplyInput();
+        }
+
+        public void ImportSvg()
+        {
+            // Select a XML file
+            string fileName = null;
+            var fileDialog = new CommonOpenFileDialog {Filters = {new CommonFileDialogFilter("Scalable Vector Graphics", "*.svg")}};
+            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                fileName = fileDialog.FileName;
+            else
+                return;
+
+            var settings = new WpfDrawingSettings();
+            settings.IncludeRuntime = true;
+            settings.TextAsGeometry = true;
+
+            var converter = new FileSvgConverter(settings);
+            converter.Convert(fileName);
+            var xaml = File.ReadAllText(fileName.Replace(".svg", ".xaml"));
+            File.Delete(fileName.Replace(".svg", ".xaml"));
+
+            var parsed = (DrawingGroup) XamlReader.Parse(xaml, new ParserContext {BaseUri = new Uri(Path.GetDirectoryName(fileName))});
+            var geometry = GatherGeometry(parsed);
+
+            var group = new DrawingGroup {Children = new DrawingCollection(geometry)};
+            var stringValue = "";
+            foreach (var geometryDrawing in geometry)
+            {
+                var scaled = Geometry.Combine(
+                    geometryDrawing.Geometry,
+                    geometryDrawing.Geometry, GeometryCombineMode.Intersect,
+                    new TransformGroup
+                    {
+                        Children = new TransformCollection
+                        {
+                            new TranslateTransform(group.Bounds.X * -1, group.Bounds.Y * -1),
+                            new ScaleTransform(1.0 / group.Bounds.Width, 1.0 / group.Bounds.Height)
+                        }
+                    }
+                );
+
+                var scaledString = scaled.ToString(CultureInfo.InvariantCulture)
+                    .Replace("F1", "")
+                    .Replace(";", ",")
+                    .Replace("L", " L")
+                    .Replace("C", " C");
+
+                stringValue = stringValue + " " + scaledString;
+            }
+
+            InputShapeData = stringValue.Trim();
+            ApplyInput();
+        }
+
+        public List<GeometryDrawing> GatherGeometry(DrawingGroup drawingGroup)
+        {
+            var result = new List<GeometryDrawing>();
+            result.AddRange(drawingGroup.Children.Where(c => c is GeometryDrawing).Cast<GeometryDrawing>());
+            foreach (var childGroup in drawingGroup.Children.Where(c => c is DrawingGroup).Cast<DrawingGroup>())
+                result.AddRange(GatherGeometry(childGroup));
+
+            return result;
         }
 
         private Point GetPercentagePosition(Point position)
@@ -279,7 +339,7 @@ namespace LayoutEditor.UI.Controls
         {
             _imageStream?.Dispose();
 
-            string filePath = LedImagePath;
+            var filePath = LedImagePath;
             if (filePath != null && File.Exists(filePath))
             {
                 _imageStream = new MemoryStream(File.ReadAllBytes(filePath));
