@@ -79,6 +79,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
@@ -143,14 +144,24 @@
                          Grid.Column="0"
                          Grid.ColumnSpan="2" />
 
-                <Label Content="{Binding LedImageText}" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" />
-                <TextBox MinHeight="23" Text="{Binding SelectedLed.InputImage}" VerticalAlignment="Top" IsReadOnly="True" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,0,24,0" />
-                <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Command="{s:Action SelectLedImage}">...</Button>
+                <Button s:View.ActionTarget="{Binding SelectedLed}"
+                        Command="{s:Action ImportSvg}"
+                        Content="Import SVG"
+                        Grid.Row="10"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        HorizontalAlignment="Stretch"
+                        Margin="5 0 0 0"
+                        VerticalAlignment="Top" />
 
-                <Button Command="{s:Action ApplyLed}" Content="Apply" Grid.Row="12" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5 5 2 0" VerticalAlignment="Top" />
-                <Button Command="{s:Action RemoveLed}" Content="Remove LED" Grid.Row="12" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5 5 0 0" VerticalAlignment="Top" />
+                <Label Content="{Binding LedImageText}" Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2" />
+                <TextBox MinHeight="23" Text="{Binding SelectedLed.InputImage}" VerticalAlignment="Top" IsReadOnly="True" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,0,24,0" />
+                <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right" Command="{s:Action SelectLedImage}">...</Button>
 
-                <ListBox Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,5,0,5" ItemsSource="{Binding LedViewModels}" SelectedItem="{Binding SelectedLed}">
+                <Button Command="{s:Action ApplyLed}" Content="Apply" Grid.Row="13" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5 5 2 0" VerticalAlignment="Top" />
+                <Button Command="{s:Action RemoveLed}" Content="Remove LED" Grid.Row="13" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5 5 0 0" VerticalAlignment="Top" />
+
+                <ListBox Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,5,0,5" ItemsSource="{Binding LedViewModels}" SelectedItem="{Binding SelectedLed}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding LedLayout.Id}" />
@@ -158,9 +169,9 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <Button Command="{s:Action AddLed}" CommandParameter="True" Content="Add LED before" Grid.Row="14" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                <Button Command="{s:Action AddLed}" CommandParameter="True" Content="Add LED before" Grid.Row="15" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                         Margin="5 0 2 0" />
-                <Button Command="{s:Action AddLed}" CommandParameter="False" Content="Add LED after" Grid.Row="14" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
+                <Button Command="{s:Action AddLed}" CommandParameter="False" Content="Add LED after" Grid.Row="15" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"
                         Margin="5 0 0 0" />
 
             </Grid>
