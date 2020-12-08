@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using LayoutEditor.UI.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using RGB.NET.Core.Layout;
@@ -41,6 +42,12 @@ namespace LayoutEditor.UI.Pages
             }
             else
                 return;
+
+            if (model.DeviceLayout == null)
+            {
+                _windowManager.ShowMessageBox("Failed to load layout.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             _shellViewModel.Start(model);
         }
