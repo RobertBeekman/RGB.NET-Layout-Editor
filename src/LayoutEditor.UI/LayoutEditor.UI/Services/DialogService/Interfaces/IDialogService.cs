@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using LayoutEditor.UI.Services.Interfaces;
-using LayoutEditor.UI.ViewModels;
 
-namespace LayoutEditor.UI.Services.DialogService
+namespace LayoutEditor.UI.Services.DialogService.Interfaces
 {
     public interface IDialogService : IUIService
     {

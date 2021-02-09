@@ -1,45 +1,33 @@
 ﻿using System.Reactive.Disposables;
 using System.Threading.Tasks;
+using LayoutEditor.UI.Services.DialogService.Interfaces;
+using LayoutEditor.UI.ViewModels.Layout.Dialogs;
 using LayoutEditor.UI.Views.Layout;
 using ReactiveUI;
 
 namespace LayoutEditor.UI.ViewModels.Layout
 {
-    public class LayoutEditorViewModel : ViewModelBase, IActivatableViewModel
+    public class LayoutEditorViewModel : ViewModelBase
     {
+        private readonly IDialogService _dialogService;
+
         public LayoutEditorViewModel()
         {
-            Activator = new ViewModelActivator();
-            this.WhenActivated(disposables =>
-            {
-                Activate();
-                Disposable
-                    .Create(() => { Deactivate(); })
-                    .DisposeWith(disposables);
-            });
+
+        }
+
+        public LayoutEditorViewModel(IDialogService dialogService)
+        {
+            _dialogService = dialogService;
         }
 
         public LayoutEditorView View { get; set; }
         public string Name { get; set; }
         public string FilePath { get; set; }
 
-        #region Implementation of IActivatableViewModel
-
-        /// <inheritdoc />
-        public ViewModelActivator Activator { get; }
-
-        #endregion
-
-        private void Activate()
-        {
-        }
-
-        private void Deactivate()
-        {
-        }
-
         public async Task OpenDetails()
         {
+            await _dialogService.ShowDialogAsync<LayoutPropertiesDialogViewModel>();
         }
     }
 }

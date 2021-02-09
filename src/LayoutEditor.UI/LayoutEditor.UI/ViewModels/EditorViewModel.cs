@@ -6,11 +6,13 @@ namespace LayoutEditor.UI.ViewModels
 {
     public class EditorViewModel : ViewModelBase
     {
-        public EditorViewModel()
+        public EditorViewModel(LayoutEditorViewModel layoutEditorViewModel)
         {
+            layoutEditorViewModel.Name = "Corsair K95";
+            layoutEditorViewModel.FilePath = @"C:\..\K95.xml";
             Items = new ObservableCollection<LayoutEditorViewModel>
             {
-                new() {Name = "Corsair K95", FilePath = @"C:\..\K95.xml"}
+                layoutEditorViewModel,
             };
             SelectedItem = Items.FirstOrDefault();
         }

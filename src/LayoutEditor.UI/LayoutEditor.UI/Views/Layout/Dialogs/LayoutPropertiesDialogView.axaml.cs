@@ -1,11 +1,10 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using LayoutEditor.UI.Controls;
+using LayoutEditor.UI.Services.DialogService;
 
 namespace LayoutEditor.UI.Views.Layout.Dialogs
 {
-    public class LayoutPropertiesDialogView : FluentWindow
+    public class LayoutPropertiesDialogView : DialogWindowBase
     {
         public LayoutPropertiesDialogView()
         {

@@ -22,13 +22,11 @@ namespace LayoutEditor.UI
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = Kernel.Get<MainWindowViewModel>(),
-                };
-            }
+                desktop.MainWindow = new MainWindow();
 
-            base.OnFrameworkInitializationCompleted();
+                base.OnFrameworkInitializationCompleted();
+                desktop.MainWindow.DataContext = Kernel.Get<MainWindowViewModel>();
+            }
         }
     }
 }

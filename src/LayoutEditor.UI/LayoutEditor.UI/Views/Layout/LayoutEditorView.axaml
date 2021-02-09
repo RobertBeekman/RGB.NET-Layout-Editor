@@ -2,9 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:layout="clr-namespace:LayoutEditor.UI.ViewModels.Layout"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="LayoutEditor.UI.Views.Layout.LayoutEditorView"
              Margin="20 0 20 20">
+    <Design.DataContext>
+        <layout:LayoutEditorViewModel />
+    </Design.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -23,27 +27,31 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <Button Command="{Binding OpenDetails}">
+            Open details
+        </Button>
+        
         <Label Content="Name" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0" />
         <TextBox TextWrapping="Wrap" Text="{Binding DeviceLayout.Name}" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="3" />
-
+        
         <Label Content="Description" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="1" />
         <TextBox TextWrapping="Wrap" Text="{Binding DeviceLayout.Description}" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" />
-
+        
         <Label Content="Vendor" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="2" />
         <TextBox TextWrapping="Wrap" Text="{Binding DeviceLayout.Vendor}" Grid.Column="1" Grid.Row="2" />
         <Label Content="Model" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="2" />
         <TextBox TextWrapping="Wrap" Text="{Binding DeviceLayout.Model}" Grid.Column="3" Grid.Row="2" />
-
+        
         <Label Content="Width" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="3" />
         <NumericUpDown Value="{Binding DeviceLayout.Width}" Grid.Column="1" Grid.Row="3" />
         <Label Content="Height" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="3" />
         <NumericUpDown Value="{Binding DeviceLayout.Height}" Grid.Column="3" Grid.Row="3" />
-
+        
         <Label Content="Type" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="4" />
         <ComboBox SelectedItem="{Binding DeviceLayout.Type}" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" />
         <Label Content="Lighting" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="4" />
         <ComboBox SelectedItem="{Binding DeviceLayout.Lighting}" Grid.Column="3" Grid.Row="4" HorizontalAlignment="Stretch" />
-
+        
         <Label Content="Image base path" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="5" />
         <Grid Grid.Column="1" Grid.Row="5">
             <Grid.ColumnDefinitions>
@@ -62,7 +70,7 @@
             <TextBox TextWrapping="Wrap" Text="{Binding DeviceImage}" IsReadOnly="True" Grid.Column="0" />
             <Button HorizontalAlignment="Right" Grid.Column="1">...</Button>
         </Grid>
-
+        
         <Label Content="Image layout" HorizontalAlignment="Left" Grid.Column="0" Grid.Row="6" />
         <Grid Grid.Column="1" Grid.Row="6">
             <Grid.ColumnDefinitions>
@@ -72,7 +80,7 @@
             <ComboBox Items="{Binding ImageLayouts}" SelectedItem="{Binding SelectedImageLayout}" Grid.Column="0" HorizontalAlignment="Stretch" />
             <Button Grid.Column="1" HorizontalAlignment="Right">+</Button>
         </Grid>
-
+        
         <Label Content="Default LED size" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="6" />
         <Grid Grid.Column="3" Grid.Row="6">
             <Grid.ColumnDefinitions>

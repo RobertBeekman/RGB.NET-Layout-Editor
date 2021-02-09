@@ -7,7 +7,7 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
-    <Folder Include="Services\DialogService\Interfaces\" />
+    <Folder Include="ViewModels\Dialogs\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Styles\SideBar.xaml" />

@@ -14,7 +14,7 @@
         <DockPanel HorizontalAlignment="Stretch">
             <ExperimentalAcrylicBorder DockPanel.Dock="Left" Width="240">
                 <ExperimentalAcrylicBorder.Material>
-                    <ExperimentalAcrylicMaterial TintColor="Black" MaterialOpacity="0.85" TintOpacity="1" />
+                    <ExperimentalAcrylicMaterial TintColor="Black" MaterialOpacity="0.75" TintOpacity="1" />
                 </ExperimentalAcrylicBorder.Material>
                 <TextBlock FontSize="16" FontWeight="Light" Margin="20 45 20 0" HorizontalAlignment="Center">
                     RGB.NET Layout Editor
@@ -22,7 +22,7 @@
             </ExperimentalAcrylicBorder>
             <ExperimentalAcrylicBorder IsHitTestVisible="False">
                 <ExperimentalAcrylicBorder.Material>
-                    <ExperimentalAcrylicMaterial TintColor="#222222" MaterialOpacity="0.85" TintOpacity="1" />
+                    <ExperimentalAcrylicMaterial TintColor="#222222" MaterialOpacity="0.70" TintOpacity="1" />
                 </ExperimentalAcrylicBorder.Material>
                 <TextBlock Text="{Binding SelectedItem.Name}" Margin="20" FontSize="32" FontWeight="Light" />
             </ExperimentalAcrylicBorder>
