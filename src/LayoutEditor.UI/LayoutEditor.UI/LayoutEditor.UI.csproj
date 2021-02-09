@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <AvaloniaResource Include="Assets\**" />
+    <Folder Include="Services\DialogService\Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Styles\SideBar.xaml" />
+    <None Remove="Styles\Styles.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Styles\SideBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Styles\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+    <PackageReference Include="Ninject" Version="3.3.4" />
+    <PackageReference Include="ninject.extensions.conventions" Version="3.3.0" />
+  </ItemGroup>
+</Project>

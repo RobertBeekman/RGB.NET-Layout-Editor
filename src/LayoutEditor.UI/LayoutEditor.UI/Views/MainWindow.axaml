@@ -1,0 +1,24 @@
+<controls:FluentWindow xmlns="https://github.com/avaloniaui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:vm="using:LayoutEditor.UI.ViewModels"
+                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                       xmlns:controls="clr-namespace:LayoutEditor.UI.Controls"
+                       mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                       x:Class="LayoutEditor.UI.Views.MainWindow"
+                       Icon="{x:Null}"
+                       WindowStartupLocation="CenterScreen"
+                       Background="{x:Null}"
+                       Title="RGB.NET Layout Editor"
+                       Content="{Binding EditorViewModel}">
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <controls:FluentWindow.Styles>
+        <Style Selector="TitleBar:fullscreen">
+            <Setter Property="Background" Value="#7f000000" />
+        </Style>
+    </controls:FluentWindow.Styles>
+
+</controls:FluentWindow>
