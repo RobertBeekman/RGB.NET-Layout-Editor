@@ -14,7 +14,6 @@ namespace LayoutEditor.UI.Views.Layout
 
         private void InitializeComponent()
         {
-            this.WhenActivated(_ => ViewModel.View = this);
             AvaloniaXamlLoader.Load(this);
         }
     }

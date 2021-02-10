@@ -6,6 +6,10 @@ namespace LayoutEditor.UI.ViewModels
 {
     public class EditorViewModel : ViewModelBase
     {
+        public EditorViewModel()
+        {
+            
+        }
         public EditorViewModel(LayoutEditorViewModel layoutEditorViewModel)
         {
             layoutEditorViewModel.Name = "Corsair K95";

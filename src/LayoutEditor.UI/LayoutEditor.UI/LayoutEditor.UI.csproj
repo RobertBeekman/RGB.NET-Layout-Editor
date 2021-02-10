@@ -29,4 +29,12 @@
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="ninject.extensions.conventions" Version="3.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="RGB.NET.Core">
+      <HintPath>..\..\..\..\RGB.NET\bin\net5.0\RGB.NET.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="RGB.NET.Layout">
+      <HintPath>..\..\..\..\RGB.NET\bin\net5.0\RGB.NET.Layout.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

@@ -16,21 +16,15 @@
                 <ExperimentalAcrylicBorder.Material>
                     <ExperimentalAcrylicMaterial TintColor="Black" MaterialOpacity="0.75" TintOpacity="1" />
                 </ExperimentalAcrylicBorder.Material>
-                <TextBlock FontSize="16" FontWeight="Light" Margin="20 45 20 0" HorizontalAlignment="Center">
+                <TextBlock FontSize="16" FontWeight="Light" Margin="0 45" HorizontalAlignment="Center">
                     RGB.NET Layout Editor
                 </TextBlock>
             </ExperimentalAcrylicBorder>
-            <ExperimentalAcrylicBorder IsHitTestVisible="False">
-                <ExperimentalAcrylicBorder.Material>
-                    <ExperimentalAcrylicMaterial TintColor="#222222" MaterialOpacity="0.70" TintOpacity="1" />
-                </ExperimentalAcrylicBorder.Material>
-                <TextBlock Text="{Binding SelectedItem.Name}" Margin="20" FontSize="32" FontWeight="Light" />
-            </ExperimentalAcrylicBorder>
+			<Panel/>
         </DockPanel>
 
         <TabControl x:Name="TabControl"
                     Classes="sidebar"
-                    Margin="0 40 0 20"
                     Items="{Binding Items}"
                     SelectedItem="{Binding SelectedItem}">
 			<TabControl.Styles>

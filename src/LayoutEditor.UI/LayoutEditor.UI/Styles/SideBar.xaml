@@ -19,7 +19,7 @@
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}">
           <DockPanel>
-            <ScrollViewer Width="240" Margin="0 30 0 0"
+            <ScrollViewer Width="240" Margin="0 110 0 0"
                 Name="PART_ScrollViewer"
                 HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
                 VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
@@ -27,6 +27,7 @@
                 DockPanel.Dock="Left">
               <ItemsPresenter
                   Name="PART_ItemsPresenter"
+				  
                   Items="{TemplateBinding Items}"
                   ItemsPanel="{TemplateBinding ItemsPanel}"
                   ItemTemplate="{TemplateBinding ItemTemplate}">
