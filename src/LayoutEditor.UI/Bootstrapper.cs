@@ -21,8 +21,11 @@ namespace LayoutEditor.UI
         protected override void OnUnhandledException(DispatcherUnhandledExceptionEventArgs e)
         {
             var windowManager = Container.Get<IWindowManager>();
-            windowManager.ShowMessageBox(e.Exception.Message + "\r\nCopied stack trace to clipboard", e.Exception.GetType().Name);
+            windowManager.ShowMessageBox(e.Exception.Message + "\r\nCopied stack trace to clipboard\r\n " +
+                                         "Its best you save your work and restart.", e.Exception.GetType().Name);
             Clipboard.SetText(e.Exception.StackTrace);
+
+            e.Handled = true;
         }
     }
 }

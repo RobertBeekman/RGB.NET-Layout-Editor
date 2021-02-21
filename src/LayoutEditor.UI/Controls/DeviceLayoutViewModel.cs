@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using LayoutEditor.UI.Dialogs;
+using LayoutEditor.UI.Layout;
 using LayoutEditor.UI.Models;
 using LayoutEditor.UI.Pages;
 using RGB.NET.Layout;
@@ -196,7 +197,7 @@ namespace LayoutEditor.UI.Controls
                     index = Items.IndexOf(SelectedLed) + 1;
             }
 
-            var ledLayout = new LedLayout {Id = ledId};
+            var ledLayout = new LedLayout {Id = ledId, CustomData = new LayoutCustomLedData()};
             var ledViewModel = new LedViewModel(Model, this, _windowManager, ledLayout);
 
             DeviceLayout.InternalLeds.Insert(index, ledLayout);

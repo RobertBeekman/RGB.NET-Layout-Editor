@@ -11,8 +11,8 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using LayoutEditor.UI.Controls;
 using LayoutEditor.UI.Dialogs;
+using LayoutEditor.UI.Layout;
 using LayoutEditor.UI.Models;
-using LayoutEditor.UI.RGB.NET;
 using Microsoft.VisualBasic;
 using Ookii.Dialogs.Wpf;
 using RGB.NET.Core;
@@ -50,7 +50,7 @@ namespace LayoutEditor.UI.Pages
             }
 
             SelectedLogicalLayout = LogicalLayouts.FirstOrDefault();
-            
+
             // Lame but works
             if (Model.FilePath.EndsWith("ABNT.xml"))
                 Model.PhysicalLayout = KeyboardLayoutType.ABNT;
@@ -188,6 +188,10 @@ namespace LayoutEditor.UI.Pages
                     File.Copy(sourceDeviceImage.LocalPath, targetDeviceImage.LocalPath);
                 }
 
+                if (doc["Device"]["CustomData"] == null)
+                    doc["Device"].AppendChild(doc.CreateElement("CustomData"));
+                if (doc["Device"]["CustomData"]["DeviceImage"] == null)
+                    doc["Device"]["CustomData"].AppendChild(doc.CreateElement("DeviceImage"));
                 doc["Device"]["CustomData"]["DeviceImage"].InnerText = Path.GetFileName(LayoutCustomDeviceData.DeviceImage);
             }
 
@@ -208,13 +212,25 @@ namespace LayoutEditor.UI.Pages
                 // Only the image of the current logical layout is available as an URI, iterate each layout and find the images manually
                 foreach (LayoutCustomLedDataLogicalLayout logicalLayout in layoutCustomLedData.LogicalLayouts)
                 {
+                    if (led["CustomData"] == null)
+                        led.AppendChild(doc.CreateElement("CustomData"));
+                    if (led["CustomData"]["LogicalLayouts"] == null)
+                        led["CustomData"].AppendChild(doc.CreateElement("LogicalLayouts"));
+
                     var layout = led["CustomData"]["LogicalLayouts"]
                         .ChildNodes
                         .Cast<XmlNode>()
                         .FirstOrDefault(l => l.Attributes != null &&
-                                             (l.Attributes["Name"] == null && logicalLayout.Name == null || l.Attributes["Name"].Value == logicalLayout.Name));
+                                             (
+                                                 l.Attributes["Name"] == null &&
+                                                 logicalLayout.Name == null ||
+                                                 l.Attributes["Name"] != null && l.Attributes["Name"].Value == logicalLayout.Name
+                                             ));
                     if (layout == null)
-                        continue;
+                    {
+                        layout = doc.CreateElement("LogicalLayout");
+                        led["CustomData"]["LogicalLayouts"].AppendChild(layout);
+                    }
 
                     Uri sourceLedImage = new(sourceDirectory, logicalLayout.Image);
                     Uri targetLedImage = new(targetLedDirectory, Path.GetFileName(logicalLayout.Image));
@@ -226,7 +242,15 @@ namespace LayoutEditor.UI.Pages
                         File.Copy(sourceLedImage.LocalPath, targetLedImage.LocalPath);
                     }
 
+                    if (layout.Attributes["Image"] == null)
+                        layout.Attributes.Append(doc.CreateAttribute("Image"));
                     layout.Attributes["Image"].Value = HttpUtility.UrlDecode(targetDirectory.MakeRelativeUri(targetLedImage).OriginalString);
+                    if (logicalLayout.Name != null && logicalLayout.Name != "Empty")
+                    {
+                        if (layout.Attributes["Name"] == null)
+                            layout.Attributes.Append(doc.CreateAttribute("Name"));
+                        layout.Attributes["Name"].Value = logicalLayout.Name;
+                    }
                 }
             }
 
@@ -244,7 +268,9 @@ namespace LayoutEditor.UI.Pages
         public string GetLayoutFileName(bool includeExtension = true)
         {
             // Take out invalid file name chars, may not be perfect but neither are you
-            string fileName = Path.GetInvalidFileNameChars().Aggregate(DeviceLayout.Model, (current, c) => current.Replace(c, '-'));
+            string fileName = DeviceLayout.Model != null
+                ? Path.GetInvalidFileNameChars().Aggregate(DeviceLayout.Model, (current, c) => current.Replace(c, '-'))
+                : "Unknown";
             if (DeviceLayout.Type == RGBDeviceType.Keyboard)
                 fileName = $"{fileName}-{Model.PhysicalLayout.ToString().ToUpper()}";
             if (includeExtension)

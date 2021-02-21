@@ -10,8 +10,8 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LayoutEditor.UI.Editors;
+using LayoutEditor.UI.Layout;
 using LayoutEditor.UI.Models;
-using LayoutEditor.UI.RGB.NET;
 using Ookii.Dialogs.Wpf;
 using RGB.NET.Core;
 using RGB.NET.Layout;
@@ -74,6 +74,8 @@ namespace LayoutEditor.UI.Controls
         {
             get
             {
+                if (_logicalLayout.Image == null)
+                    return DependencyProperty.UnsetValue;
                 var fileUri = new Uri(new Uri(Model.FilePath), _logicalLayout.Image);
                 if (!File.Exists(fileUri.LocalPath))
                     return DependencyProperty.UnsetValue;
@@ -94,16 +96,18 @@ namespace LayoutEditor.UI.Controls
 
         private void ApplyLogicalLayout()
         {
-            _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault(l =>
-                l.Name == _layoutViewModel.EditorViewModel.SelectedLogicalLayout);
-            if (_logicalLayout == null)
+            if (_layoutViewModel.EditorViewModel.SelectedLogicalLayout == "Empty")
                 _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault();
+            else
+                _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault(l => l.Name == _layoutViewModel.EditorViewModel.SelectedLogicalLayout);
+            
             if (_logicalLayout == null)
             {
                 _logicalLayout = new LayoutCustomLedDataLogicalLayout();
-                _logicalLayout.Name = _layoutViewModel.EditorViewModel.SelectedLogicalLayout == "None"
+                _logicalLayout.Name = _layoutViewModel.EditorViewModel.SelectedLogicalLayout == "Empty"
                     ? null
                     : _layoutViewModel.EditorViewModel.SelectedLogicalLayout;
+                LayoutCustomLedData.LogicalLayouts.Add(_logicalLayout);
             }
 
             InputImage = Path.GetFileName(_logicalLayout.Image);

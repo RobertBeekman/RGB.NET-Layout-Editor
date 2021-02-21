@@ -2,7 +2,7 @@
 
 #pragma warning disable 1591
 
-namespace LayoutEditor.UI.RGB.NET
+namespace LayoutEditor.UI.Layout
 {
     /// <summary>
     ///     Represents extra Artemis-specific information stored in RGB.NET layouts
