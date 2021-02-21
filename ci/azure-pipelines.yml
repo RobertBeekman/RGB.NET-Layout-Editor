@@ -10,26 +10,45 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  solution: '**/LayoutEditor.sln'
 
 steps:
-- task: NuGetToolInstaller@1
+- checkout: self
+  path: s/RGB.NET-Layout-Editor
 
-- task: NuGetCommand@2
+- task: DownloadPipelineArtifact@2
+  displayName: 'Download RGB.NET build artifacts'
+  inputs:
+    buildType: 'specific'
+    project: '882fdc71-c09c-4923-8ab0-2cd9fcf0656d'
+    definition: '3'
+    buildVersionToDownload: 'latest'
+    artifactName: 'RGB.NET development build'
+    targetPath: '$(Pipeline.Workspace)\s\RGB.NET\bin\net5.0'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
   inputs:
     command: 'restore'
-    restoreSolution: '$(solution)'
-    feedsToUse: 'config'
-    nugetConfigPath: 'src/NuGet.config'
+    projects: '$(solution)'
+    feedsToUse: 'select'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Artemis'
   inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:OutDir=$(Build.BinariesDirectory)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: 'publish'
+    publishWebProjects: false
+    projects: '$(solution)'
+    arguments: '--runtime win-x64 --self-contained false --output $(Build.BinariesDirectory) /nowarn:cs1591'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Upload build to Azure Pipelines'
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/build'
+    artifact: 'Artemis build'
+    publishLocation: 'pipeline'
 
 - task: ArchiveFiles@2
   inputs:

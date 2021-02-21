@@ -8,12 +8,12 @@ using System.Windows.Input;
 using LayoutEditor.UI.Dialogs;
 using LayoutEditor.UI.Models;
 using LayoutEditor.UI.Pages;
-using RGB.NET.Core.Layout;
+using RGB.NET.Layout;
 using Stylet;
 
 namespace LayoutEditor.UI.Controls
 {
-    public class DeviceLayoutViewModel : PropertyChangedBase
+    public class DeviceLayoutViewModel : Conductor<LedViewModel>.Collection.AllActive
     {
         private readonly IWindowManager _windowManager;
         private Point? _lastPanPosition;
@@ -26,28 +26,13 @@ namespace LayoutEditor.UI.Controls
             Model = model;
             DeviceLayout = model.DeviceLayout;
             EditorViewModel = editorViewModel;
-            LedViewModels = new BindableCollection<LedViewModel>(DeviceLayout.Leds.Select(l => new LedViewModel(Model, this, _windowManager, l)));
-
-            UpdateLeds();
-
-            PropertyChanged += DeviceLayoutViewModelPropertyChanged;
-            EditorViewModel.PropertyChanged += EditorViewModelOnPropertyChanged;
-
-
-            var activeWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
-            if (activeWindow != null)
-            {
-                activeWindow.KeyDown += KeyUpDown;
-                activeWindow.KeyUp += KeyUpDown;
-            }
         }
 
         public LayoutEditModel Model { get; }
         public DeviceLayout DeviceLayout { get; }
         public DeviceLayoutEditorViewModel EditorViewModel { get; }
-        public BindableCollection<LedViewModel> LedViewModels { get; set; }
         public LedViewModel SelectedLed { get; set; }
-        public string LedImageText => $"LED Image ({EditorViewModel.SelectedImageLayout})";
+        public string LedImageText => $"LED Image ({EditorViewModel.SelectedLogicalLayout})";
 
         public double Zoom { get; set; } = 1;
         public double PanX { get; set; } = 1;
@@ -58,7 +43,7 @@ namespace LayoutEditor.UI.Controls
             // Handle changing selected LED from listbox
             if (e.PropertyName == nameof(SelectedLed) && SelectedLed != null && !SelectedLed.Selected)
             {
-                var oldSelection = LedViewModels.FirstOrDefault(l => l.Selected);
+                var oldSelection = Items.FirstOrDefault(l => l.Selected);
                 if (oldSelection != null)
                 {
                     oldSelection.Selected = false;
@@ -71,13 +56,7 @@ namespace LayoutEditor.UI.Controls
 
         private void EditorViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(EditorViewModel.ImageBasePath))
-            {
-                FileChangedWatcher.SetWatchDirectory(Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath));
-                NotifyOfPropertyChange(() => LedImageText);
-                UpdateLeds();
-            }
-            else if (e.PropertyName == nameof(EditorViewModel.SelectedImageLayout))
+            if (e.PropertyName == nameof(EditorViewModel.SelectedLogicalLayout))
             {
                 NotifyOfPropertyChange(() => LedImageText);
                 UpdateLeds();
@@ -90,24 +69,18 @@ namespace LayoutEditor.UI.Controls
             if (DeviceLayout.Leds != null)
             {
                 LedLayout lastLed = null;
-                foreach (var led in DeviceLayout.Leds)
+                foreach (var ledLayout in DeviceLayout.Leds)
                 {
+                    var led = (LedLayout) ledLayout;
                     led.CalculateValues(DeviceLayout, lastLed);
                     lastLed = led;
                 }
             }
 
             // Update the LEDs in the VMs
-            var imageLayout = DeviceLayout.LedImageLayouts?.FirstOrDefault(l => l.Layout != null && l.Layout.Equals(EditorViewModel.SelectedImageLayout));
-            foreach (var ledViewModel in LedViewModels)
+            foreach (var ledViewModel in Items)
             {
                 ledViewModel.Update();
-                if (imageLayout != null)
-                {
-                    // Try to find a matching LED image layout
-                    var ledImage = imageLayout.LedImages.FirstOrDefault(i => i.Id.Equals(ledViewModel.LedLayout.Id));
-                    ledViewModel.UpdateLedImage(ledImage);
-                }
             }
         }
 
@@ -213,21 +186,21 @@ namespace LayoutEditor.UI.Controls
                 if (addBefore)
                     index = 0;
                 else
-                    index = LedViewModels.Count;
+                    index = Items.Count;
             }
             else
             {
                 if (addBefore)
-                    index = LedViewModels.IndexOf(SelectedLed);
+                    index = Items.IndexOf(SelectedLed);
                 else
-                    index = LedViewModels.IndexOf(SelectedLed) + 1;
+                    index = Items.IndexOf(SelectedLed) + 1;
             }
 
             var ledLayout = new LedLayout {Id = ledId};
             var ledViewModel = new LedViewModel(Model, this, _windowManager, ledLayout);
 
-            DeviceLayout.Leds.Insert(index, ledLayout);
-            LedViewModels.Insert(index, ledViewModel);
+            DeviceLayout.InternalLeds.Insert(index, ledLayout);
+            Items.Insert(index, ledViewModel);
 
             UpdateLeds();
             SelectLed(ledViewModel);
@@ -240,15 +213,50 @@ namespace LayoutEditor.UI.Controls
                 var ledToRemove = SelectedLed;
 
                 // Remove from view
-                LedViewModels.Remove(ledToRemove);
-                // Remove from image layouts
-                foreach (var imageLayout in DeviceLayout.LedImageLayouts)
-                    imageLayout.LedImages.RemoveAll(i => i.Id.Equals(ledToRemove.LedLayout.Id));
+                Items.Remove(ledToRemove);
                 // Remove from layout
-                DeviceLayout.Leds.Remove(ledToRemove.LedLayout);
+                DeviceLayout.InternalLeds.Remove(ledToRemove.LedLayout);
                 SelectLed(null);
                 UpdateLeds();
             }
+        }
+
+        protected override void OnInitialActivate()
+        {
+            Items.AddRange(DeviceLayout.Leds.Select(l => new LedViewModel(Model, this, _windowManager, (LedLayout)l)));
+            UpdateLeds();
+
+            PropertyChanged += DeviceLayoutViewModelPropertyChanged;
+            EditorViewModel.PropertyChanged += EditorViewModelOnPropertyChanged;
+
+            var activeWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
+            if (activeWindow != null)
+            {
+                activeWindow.KeyDown += KeyUpDown;
+                activeWindow.KeyUp += KeyUpDown;
+            }
+
+            var ledWithLayout = Items.FirstOrDefault(i => i.LayoutCustomLedData != null && 
+                                                          i.LayoutCustomLedData.LogicalLayouts.Any())?.LayoutCustomLedData.LogicalLayouts.FirstOrDefault();
+            if (ledWithLayout != null) 
+                EditorViewModel.LedSubfolder = Path.GetDirectoryName(ledWithLayout.Image);
+
+            base.OnInitialActivate();
+        }
+
+        protected override void OnClose()
+        {
+            PropertyChanged -= DeviceLayoutViewModelPropertyChanged;
+            EditorViewModel.PropertyChanged -= EditorViewModelOnPropertyChanged;
+
+            var activeWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive);
+            if (activeWindow != null)
+            {
+                activeWindow.KeyDown -= KeyUpDown;
+                activeWindow.KeyUp -= KeyUpDown;
+            }
+
+            base.OnClose();
         }
     }
 }

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Xml;
 using LayoutEditor.UI.Models;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using RGB.NET.Core.Layout;
+using LayoutEditor.UI.RGB.NET;
+using Ookii.Dialogs.Wpf;
+using RGB.NET.Layout;
 using Stylet;
-using Stylet.Logging;
 
 namespace LayoutEditor.UI.Pages
 {
@@ -24,35 +23,19 @@ namespace LayoutEditor.UI.Pages
         {
             var model = new LayoutEditModel();
 
-            _windowManager.ShowMessageBox(
-                "First, select the base folder of the layout. All other paths will be relative to this folder.");
-
-            // Select a base path
-            var folderDialog = new CommonOpenFileDialog {IsFolderPicker = true};
-            if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
-                model.BasePath = folderDialog.FileName;
-            else
-                return;
-
-            _windowManager.ShowMessageBox(
-                "Now select the layout file itself, it should be relative to the base folder.");
-
             // Select a XML file
-            var fileDialog = new CommonOpenFileDialog
-                {InitialDirectory = model.BasePath, Filters = {new CommonFileDialogFilter("Layout Files", "*.xml")}};
-            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                ConvertLayoutFile(fileDialog.FileName);
-                model.DeviceLayout = DeviceLayout.Load(fileDialog.FileName);
-                model.DeviceLayoutSource = fileDialog.FileName;
-            }
-            else
+            VistaOpenFileDialog fileDialog = new();
+            fileDialog.Filter = "Layout files (*.xml)|*.xml";
+            if (fileDialog.ShowDialog() == false)
                 return;
+
+            ConvertLayoutFile(fileDialog.FileName);
+            model.DeviceLayout = DeviceLayout.Load(fileDialog.FileName, typeof(LayoutCustomDeviceData), typeof(LayoutCustomLedData));
+            model.FilePath = fileDialog.FileName;
 
             if (model.DeviceLayout == null)
             {
-                _windowManager.ShowMessageBox("Failed to load layout.", "", MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                _windowManager.ShowMessageBox("Failed to load layout.", "", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -85,7 +68,6 @@ namespace LayoutEditor.UI.Pages
 
             // Determine logical layouts
             if (device["LedImageLayouts"] != null)
-            {
                 foreach (XmlNode ledImageLayout in device["LedImageLayouts"].ChildNodes)
                 {
                     if (ledImageLayout["LedImages"] == null)
@@ -93,10 +75,9 @@ namespace LayoutEditor.UI.Pages
 
                     foreach (XmlNode ledImage in ledImageLayout["LedImages"].ChildNodes)
                     {
-                        
                     }
                 }
-            }
+
             // Move each logical layout to its LEDs
         }
 
@@ -108,12 +89,11 @@ namespace LayoutEditor.UI.Pages
                 "Select the base folder of the layout. All other paths will be relative to this folder.");
 
             // Select a base path
-            var folderDialog = new CommonOpenFileDialog {IsFolderPicker = true};
-            if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
-                model.BasePath = folderDialog.FileName;
-            else
+            var dialog = new VistaFolderBrowserDialog();
+            if (dialog.ShowDialog() != true)
                 return;
 
+            model.FilePath = dialog.SelectedPath;
             model.DeviceLayout = new DeviceLayout();
 
             _shellViewModel.Start(model);
