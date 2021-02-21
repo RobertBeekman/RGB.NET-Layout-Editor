@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Markup;
@@ -11,9 +11,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LayoutEditor.UI.Editors;
 using LayoutEditor.UI.Models;
-using Microsoft.WindowsAPICodePack.Dialogs;
+using LayoutEditor.UI.RGB.NET;
+using Ookii.Dialogs.Wpf;
 using RGB.NET.Core;
-using RGB.NET.Core.Layout;
+using RGB.NET.Layout;
 using SharpVectors.Converters;
 using SharpVectors.Renderers.Wpf;
 using Stylet;
@@ -22,7 +23,7 @@ using Point = System.Windows.Point;
 
 namespace LayoutEditor.UI.Controls
 {
-    public class LedViewModel : PropertyChangedBase
+    public class LedViewModel : Screen
     {
         public static Color SelectedColor = Color.FromRgb(237, 65, 131);
         public static Color HoverColor = Color.FromRgb(116, 97, 167);
@@ -30,9 +31,8 @@ namespace LayoutEditor.UI.Controls
 
         private readonly DeviceLayoutViewModel _layoutViewModel;
         private readonly IWindowManager _windowManager;
-
-        private MemoryStream _imageStream;
-        private LedImage _ledImage;
+        private LayoutCustomLedDataLogicalLayout _logicalLayout;
+        private FileSystemWatcher _fileWatcher;
 
         public LedViewModel(LayoutEditModel model, DeviceLayoutViewModel layoutViewModel, IWindowManager windowManager, LedLayout ledLayout)
         {
@@ -44,24 +44,19 @@ namespace LayoutEditor.UI.Controls
             AvailableLedIds = new BindableCollection<string>();
             LedCursor = Cursors.Hand;
 
-            PropertyChanged += LedImagePathChanged;
-            FileChangedWatcher.FileChanged += FileChangedWatcherOnFileChanged;
-
-            UpdateImageSource();
+            ApplyLogicalLayout();
         }
 
         public LayoutEditModel Model { get; }
         public LedLayout LedLayout { get; }
+        public LayoutCustomLedData LayoutCustomLedData => (LayoutCustomLedData) LedLayout.CustomData;
         public BindableCollection<string> AvailableLedIds { get; set; }
-        public ImageSource LedImageSource { get; set; }
 
-        public string LedImagePath => Model.GetAbsoluteImageDirectory(_ledImage?.Image);
         public bool Selected { get; set; }
 
         public string InputId { get; set; }
         public Shape InputShape { get; set; }
         public string InputShapeData { get; set; }
-        public string InputImage { get; set; }
         public string InputX { get; set; }
         public string InputY { get; set; }
         public string InputWidth { get; set; }
@@ -73,18 +68,66 @@ namespace LayoutEditor.UI.Controls
         public int ZIndex => ShapeEditor != null ? 2 : 1;
         public bool CanStartShapeEdit => InputShape == Shape.Custom;
 
+        public string InputImage { get; set; }
+
+        public object LedImage
+        {
+            get
+            {
+                var fileUri = new Uri(new Uri(Model.FilePath), _logicalLayout.Image);
+                if (!File.Exists(fileUri.LocalPath))
+                    return DependencyProperty.UnsetValue;
+
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                image.UriSource = fileUri;
+                image.EndInit();
+                return image;
+            }
+        }
+
         public Geometry DisplayGeometry { get; set; }
         public SolidColorBrush FillBrush { get; set; }
         public SolidColorBrush BorderBrush { get; set; }
 
+        private void ApplyLogicalLayout()
+        {
+            _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault(l =>
+                l.Name == _layoutViewModel.EditorViewModel.SelectedLogicalLayout);
+            if (_logicalLayout == null)
+                _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault();
+            if (_logicalLayout == null)
+            {
+                _logicalLayout = new LayoutCustomLedDataLogicalLayout();
+                _logicalLayout.Name = _layoutViewModel.EditorViewModel.SelectedLogicalLayout == "None"
+                    ? null
+                    : _layoutViewModel.EditorViewModel.SelectedLogicalLayout;
+            }
+
+            InputImage = Path.GetFileName(_logicalLayout.Image);
+            NotifyOfPropertyChange(nameof(LedImage));
+
+            var filePath = new Uri(new Uri(Model.FilePath), _logicalLayout.Image).LocalPath;
+            if (_fileWatcher != null)
+                _fileWatcher.Changed -= FileWatcherOnChanged;
+
+            _fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(filePath)!, Path.GetFileName(filePath)!)
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.Size,
+                EnableRaisingEvents = true
+            };
+            _fileWatcher.Changed += FileWatcherOnChanged;
+        }
+
+        private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
+        {
+            NotifyOfPropertyChange(nameof(LedImage));
+        }
+
         public void ApplyInput()
         {
-            // If the ID changed the image layouts must change as well
-            if (!LedLayout.Id.Equals(InputId))
-                foreach (var imageLayout in Model.DeviceLayout.LedImageLayouts)
-                foreach (var ledImage in imageLayout.LedImages.Where(l => l.Id.Equals(LedLayout.Id)))
-                    ledImage.Id = InputId;
-
             LedLayout.Id = InputId;
             LedLayout.DescriptiveX = InputX;
             LedLayout.DescriptiveY = InputY;
@@ -98,62 +141,30 @@ namespace LayoutEditor.UI.Controls
                 LedLayout.DescriptiveShape = InputShape.ToString();
 
             // If LED image exists, update it
-            if (_ledImage != null)
-            {
-                _ledImage.Image = InputImage;
-                NotifyOfPropertyChange(() => LedImagePath);
-            }
-            // Create a new LED image and add it to the layout
-            else
-            {
-                var ledImage = new LedImage {Id = LedLayout.Id, Image = InputImage};
-                // Find the current layout
-                var layout = Model.DeviceLayout.LedImageLayouts.FirstOrDefault(l => l.Layout != null && l.Layout.Equals(_layoutViewModel.EditorViewModel.SelectedImageLayout));
-                // If missing, create it
-                if (layout == null)
-                {
-                    layout = new LedImageLayout {Layout = _layoutViewModel.EditorViewModel.SelectedImageLayout};
-                    Model.DeviceLayout.LedImageLayouts.Add(layout);
-                }
-
-                layout.LedImages.Add(ledImage);
-                UpdateLedImage(ledImage);
-            }
-
             _layoutViewModel.UpdateLeds();
         }
 
         public void Update()
         {
+            ApplyLogicalLayout();
             UpdateAvailableLedIds();
             PopulateInput();
             CreateLedGeometry();
         }
 
-        public void UpdateLedImage(LedImage ledImage)
-        {
-            _ledImage = ledImage;
-            InputImage = _ledImage?.Image;
-            NotifyOfPropertyChange(() => LedImagePath);
-        }
-
         public void SelectImage()
         {
-            var fileDialog = new CommonOpenFileDialog
-                {InitialDirectory = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath), Filters = {new CommonFileDialogFilter("Image Files", "*.png")}};
-            if (fileDialog.ShowDialog() != CommonFileDialogResult.Ok)
+            VistaOpenFileDialog dialog = new();
+            dialog.Filter = "Image files (*.png)|*.png";
+            dialog.InitialDirectory = Path.GetDirectoryName(Model.FilePath);
+            if (dialog.ShowDialog() == false)
                 return;
 
-            // Folder must be relative to the image base path
-            var imageBasePath = Path.Combine(Model.BasePath, Model.DeviceLayout.ImageBasePath);
-            if (!fileDialog.FileName.StartsWith(imageBasePath))
-            {
-                _windowManager.ShowMessageBox("Image path must be relative to " + imageBasePath);
-                return;
-            }
-
-            var relativePath = fileDialog.FileName.Substring(imageBasePath.Length + 1, fileDialog.FileName.Length - imageBasePath.Length - 1);
-            InputImage = relativePath;
+            var relativePath =
+                new Uri(Path.GetDirectoryName(Model.FilePath) + "/").MakeRelativeUri(new Uri(dialog.FileName));
+            _logicalLayout.Image = HttpUtility.UrlDecode(relativePath.OriginalString);
+            InputImage = Path.GetFileName(_logicalLayout.Image);
+            NotifyOfPropertyChange(nameof(LedImage));
         }
 
         private void UpdateAvailableLedIds()
@@ -181,7 +192,8 @@ namespace LayoutEditor.UI.Controls
             if (ShapeEditor != null)
                 try
                 {
-                    geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true), GeometryCombineMode.Xor, null);
+                    geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true),
+                        GeometryCombineMode.Xor, null);
                 }
                 catch (Exception)
                 {
@@ -198,7 +210,8 @@ namespace LayoutEditor.UI.Controls
                         catch (Exception e)
                         {
                             geometry = new RectangleGeometry(geometryRectangle);
-                            _windowManager.ShowMessageBox("Failed to parse shape data, showing a rectangle instead.\n\n " + e.Message, InputId);
+                            _windowManager.ShowMessageBox(
+                                "Failed to parse shape data, showing a rectangle instead.\n\n " + e.Message, InputId);
                         }
 
                         break;
@@ -212,7 +225,8 @@ namespace LayoutEditor.UI.Controls
                         throw new ArgumentOutOfRangeException();
                 }
 
-            DisplayGeometry = Geometry.Combine(Geometry.Empty, geometry, GeometryCombineMode.Union, new ScaleTransform(LedLayout.Width, LedLayout.Height));
+            DisplayGeometry = Geometry.Combine(Geometry.Empty, geometry, GeometryCombineMode.Union,
+                new ScaleTransform(LedLayout.Width, LedLayout.Height));
             SetColor(Selected ? SelectedColor : UnselectedColor);
 
             NotifyOfPropertyChange(() => LedLayout);
@@ -260,11 +274,15 @@ namespace LayoutEditor.UI.Controls
         {
             // Select a XML file
             string fileName = null;
-            var fileDialog = new CommonOpenFileDialog {Filters = {new CommonFileDialogFilter("Scalable Vector Graphics", "*.svg")}};
-            if (fileDialog.ShowDialog() == CommonFileDialogResult.Ok)
-                fileName = fileDialog.FileName;
-            else
+
+            VistaOpenFileDialog dialog = new();
+            dialog.Filter = "Scalable Vector Graphics (*.svg)|*.svg";
+
+            var result = dialog.ShowDialog();
+            if (result == false)
                 return;
+
+            fileName = dialog.FileName;
 
             var settings = new WpfDrawingSettings();
             settings.IncludeRuntime = true;
@@ -275,7 +293,8 @@ namespace LayoutEditor.UI.Controls
             var xaml = File.ReadAllText(fileName.Replace(".svg", ".xaml"));
             File.Delete(fileName.Replace(".svg", ".xaml"));
 
-            var parsed = (DrawingGroup) XamlReader.Parse(xaml, new ParserContext {BaseUri = new Uri(Path.GetDirectoryName(fileName))});
+            var parsed = (DrawingGroup) XamlReader.Parse(xaml,
+                new ParserContext {BaseUri = new Uri(Path.GetDirectoryName(fileName))});
             var geometry = GatherGeometry(parsed);
 
             var group = new DrawingGroup {Children = new DrawingCollection(geometry)};
@@ -320,42 +339,13 @@ namespace LayoutEditor.UI.Controls
 
         private Point GetPercentagePosition(Point position)
         {
-            return new Point(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
+            return new(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
         }
 
-        private void LedImagePathChanged(object sender, PropertyChangedEventArgs e)
+        protected override void OnClose()
         {
-            if (e.PropertyName == nameof(LedImagePath))
-                UpdateImageSource();
-        }
-
-        private void FileChangedWatcherOnFileChanged(object sender, string file)
-        {
-            if (Path.GetFileName(file) == Path.GetFileName(LedImagePath))
-                Execute.PostToUIThread(UpdateImageSource);
-        }
-
-        private void UpdateImageSource()
-        {
-            _imageStream?.Dispose();
-
-            var filePath = LedImagePath;
-            if (filePath != null && File.Exists(filePath))
-            {
-                _imageStream = new MemoryStream(File.ReadAllBytes(filePath));
-                var bitmap = new BitmapImage();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.BeginInit();
-                bitmap.StreamSource = _imageStream;
-                bitmap.EndInit();
-
-                LedImageSource = bitmap;
-            }
-            else
-            {
-                LedImageSource = null;
-                _imageStream = null;
-            }
+            _fileWatcher.Changed -= FileWatcherOnChanged;
+            base.OnClose();
         }
 
         #region Event handlers

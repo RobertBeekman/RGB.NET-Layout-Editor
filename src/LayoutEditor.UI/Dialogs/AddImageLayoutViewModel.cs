@@ -18,14 +18,14 @@ namespace LayoutEditor.UI.Dialogs
 
         public void AddImageLayout()
         {
-            if (_deviceLayoutEditorViewModel.ImageLayouts.Contains(ImageLayout))
+            if (_deviceLayoutEditorViewModel.LogicalLayouts.Contains(ImageLayout))
             {
                 _windowManager.ShowMessageBox("That image layout already exists.");
                 return;
             }
 
-            _deviceLayoutEditorViewModel.ImageLayouts.Add(ImageLayout);
-            _deviceLayoutEditorViewModel.SelectedImageLayout = ImageLayout;
+            _deviceLayoutEditorViewModel.LogicalLayouts.Add(ImageLayout);
+            _deviceLayoutEditorViewModel.SelectedLogicalLayout = ImageLayout;
             RequestClose(true);
         }
 

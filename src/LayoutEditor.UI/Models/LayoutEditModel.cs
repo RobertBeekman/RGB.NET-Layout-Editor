@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using RGB.NET.Core;
-using RGB.NET.Core.Layout;
+using RGB.NET.Layout;
 
 namespace LayoutEditor.UI.Models
 {
@@ -11,24 +10,14 @@ namespace LayoutEditor.UI.Models
     {
         private readonly List<string> _ledIds;
 
-        public string BasePath { get; set; }
-        public DeviceLayout DeviceLayout { get; set; }
-        public string DeviceLayoutSource { get; set; }
-
-        public string DeviceImage => Path.Combine(BasePath, DeviceLayout.ImageBasePath, DeviceLayout.DeviceImage);
-
         public LayoutEditModel()
         {
             _ledIds = Enum.GetValues(typeof(LedId)).Cast<LedId>().Select(v => v.ToString()).ToList();
         }
 
-        public string GetAbsoluteImageDirectory(string image)
-        {
-            if (BasePath != null && DeviceLayout.ImageBasePath != null && image != null)
-                return Path.Combine(BasePath, DeviceLayout.ImageBasePath, image);
-
-            return null;
-        }
+        public string FilePath { get; set; }
+        public DeviceLayout DeviceLayout { get; set; }
+        public KeyboardLayoutType PhysicalLayout { get; set; }
 
         public IEnumerable<string> GetAvailableLedIds(string ignore = null)
         {
