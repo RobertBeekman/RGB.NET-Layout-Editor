@@ -16,9 +16,9 @@
                 <x:Type Type="rgbCore:RGBDeviceType" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <ObjectDataProvider x:Key="LightingTypeDataProvider" MethodName="GetValues" ObjectType="{x:Type rgbCore:RGBDeviceLighting}">
+        <ObjectDataProvider x:Key="KeyboardLayoutTypeProvider" MethodName="GetValues" ObjectType="{x:Type rgbCore:KeyboardLayoutType}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type Type="rgbCore:RGBDeviceLighting" />
+                <x:Type Type="rgbCore:KeyboardLayoutType" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
@@ -55,45 +55,75 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Label Content="Name" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" />
-            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Name}" VerticalAlignment="Top" Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="3" />
+            <Label Content="Name" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
+                   Grid.Row="0" Grid.ColumnSpan="2" />
+            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Name}" VerticalAlignment="Top"
+                     Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="3" />
 
-            <Label Content="Description" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" />
-            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Description}" VerticalAlignment="Top" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="3" />
+            <Label Content="Description" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
+                   Grid.Row="1" Grid.ColumnSpan="2" />
+            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Description}"
+                     VerticalAlignment="Top" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="3" />
 
-            <Label Content="Vendor" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" />
-            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Vendor}" VerticalAlignment="Top" Grid.Column="2" Grid.Row="2" />
-            <Label Content="Model" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3" Grid.Row="2" />
-            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Model}" VerticalAlignment="Top" Grid.Column="4" Grid.Row="2" />
+            <Label Content="Vendor" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
+                   Grid.Row="2" Grid.ColumnSpan="2" />
+            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Vendor}" VerticalAlignment="Top"
+                     Grid.Column="2" Grid.Row="2" />
+            <Label Content="Model" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3"
+                   Grid.Row="2" />
+            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Model}" VerticalAlignment="Top"
+                     Grid.Column="4" Grid.Row="2" />
 
-            <Label Content="Width" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" />
-            <xctk:IntegerUpDown Height="23" Value="{Binding DeviceLayout.Width}" VerticalAlignment="Top" Grid.Column="2" Grid.Row="3" />
-            <Label Content="Height" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3" Grid.Row="3" />
-            <xctk:IntegerUpDown Height="23" Value="{Binding DeviceLayout.Height}" VerticalAlignment="Top" Grid.Column="4" Grid.Row="3" />
+            <Label Content="Width" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
+                   Grid.Row="3" Grid.ColumnSpan="2" />
+            <TextBox Height="23" Text="{Binding DeviceLayout.Width}" VerticalAlignment="Top" Grid.Column="2"
+                     Grid.Row="3" />
+            <Label Content="Height" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3"
+                   Grid.Row="3" />
+            <TextBox Height="23" Text="{Binding DeviceLayout.Height}" VerticalAlignment="Top" Grid.Column="4"
+                     Grid.Row="3" />
 
-            <Label Content="Type" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" />
-            <ComboBox ItemsSource="{Binding Source={StaticResource DeviceTypeDataProvider}}" SelectedValue="{Binding DeviceLayout.Type}" VerticalAlignment="Top" Grid.Column="2" Grid.Row="4" />
-            <Label Content="Lighting" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3" Grid.Row="4" />
-            <ComboBox ItemsSource="{Binding Source={StaticResource LightingTypeDataProvider}}" SelectedValue="{Binding DeviceLayout.Lighting}" VerticalAlignment="Top" Grid.Column="4" Grid.Row="4" />
+            <Label Content="Type" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
+                   Grid.Row="4" Grid.ColumnSpan="2" />
+            <ComboBox ItemsSource="{Binding Source={StaticResource DeviceTypeDataProvider}}"
+                      SelectedValue="{Binding DeviceLayout.Type}" VerticalAlignment="Top" Grid.Column="2" Grid.Row="4" />
+            <Label Content="Physical layout" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3" Grid.Row="4" />
+            <ComboBox ItemsSource="{Binding Source={StaticResource KeyboardLayoutTypeProvider}}"
+                      SelectedValue="{Binding Model.PhysicalLayout}" VerticalAlignment="Top" Grid.Column="4" Grid.Row="4" />
 
-            <Label Content="Image base path" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" />
-            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding ImageBasePath}" VerticalAlignment="Top" IsReadOnly="True" Grid.Column="2" Grid.Row="5" Margin="0,0,24,0" />
-            <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Column="2" Grid.Row="5" HorizontalAlignment="Right" Command="{s:Action SelectImageBasePath}">...</Button>
-            <Label Content="Device image" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3" Grid.Row="5" />
-            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceImage}" VerticalAlignment="Top" IsReadOnly="True" Grid.Column="4" Grid.Row="5" Margin="0,0,24,0" />
-            <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Column="4" Grid.Row="5" HorizontalAlignment="Right" Command="{s:Action SelectDeviceImage}">...</Button>
+            <Label Content="Device image" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" />
+            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding InputImage}" VerticalAlignment="Top"
+                     IsReadOnly="True" Grid.Column="2" Grid.Row="5" Margin="0,0,24,0" />
+            <Button Height="23" Width="25" VerticalAlignment="Top" Grid.Column="2" Grid.Row="5"
+                    HorizontalAlignment="Right" Command="{s:Action SelectDeviceImage}">
+                ...
+            </Button>
 
-            <Label Content="Image layout" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" Margin="0,26,0,0" Grid.RowSpan="2" />
-            <ComboBox ItemsSource="{Binding ImageLayouts}" SelectedValue="{Binding SelectedImageLayout}" VerticalAlignment="Top" Grid.Column="2" Grid.Row="5" Margin="0,26,30,0" Grid.RowSpan="2" />
-            <Button Height="22" Width="25" VerticalAlignment="Top" Grid.Column="2" Grid.Row="5" HorizontalAlignment="Right" Command="{s:Action AddImageLayout}" Margin="0,26,0,0" Grid.RowSpan="2">+</Button>
-            <Label Content="Default LED size" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3" Grid.Row="5" Margin="0,26,0,0" Grid.RowSpan="2" />
+            <Label Content="LED folder (opt.)" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Grid.Column="3" Grid.Row="5"
+                   ToolTip="The subfolder to place the LED images in (optional and relative to the layout location)" />
+            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding LedSubfolder}" VerticalAlignment="Top"
+                     Grid.Column="4" Grid.Row="5" />
+
+            <Label Content="Logical layout" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" Margin="0,26,0,0" Grid.RowSpan="2" />
+            <ComboBox ItemsSource="{Binding LogicalLayouts}" SelectedValue="{Binding SelectedLogicalLayout}"
+                      VerticalAlignment="Top" Grid.Column="2" Grid.Row="5" Margin="0,26,30,0" Grid.RowSpan="2" />
+            <Button Height="22" Width="25" VerticalAlignment="Top" Grid.Column="2" Grid.Row="5"
+                    HorizontalAlignment="Right" Command="{s:Action AddImageLayout}" Margin="0,26,0,0" Grid.RowSpan="2">
+                +
+            </Button>
+            <Label Content="Default LED size" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Grid.Column="3" Grid.Row="5" Margin="0,26,0,0" Grid.RowSpan="2" />
             <StackPanel Orientation="Horizontal" Grid.Column="4" Grid.Row="5" Margin="0,26,0,8" Grid.RowSpan="2">
-                <xctk:IntegerUpDown Height="23" Width="50" Value="{Binding DeviceLayout.LedUnitWidth}" VerticalAlignment="Top" />
+                <TextBox Height="23" Width="50" Text="{Binding DeviceLayout.LedUnitWidth}" VerticalAlignment="Top" />
                 <Label Content="X" Height="22" Margin="15, 0" VerticalAlignment="Top" HorizontalAlignment="Center" />
-                <xctk:IntegerUpDown Height="23" Width="50" Value="{Binding DeviceLayout.LedUnitHeight}" VerticalAlignment="Top" />
+                <TextBox Height="23" Width="50" Text="{Binding DeviceLayout.LedUnitHeight}" VerticalAlignment="Top" />
             </StackPanel>
 
-            <ContentControl s:View.Model="{Binding DeviceLayoutViewModel}" Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="5" Margin="0,18,0,0" Grid.RowSpan="2" />
+            <ContentControl s:View.Model="{Binding DeviceLayoutViewModel}" Grid.Column="0" Grid.Row="6"
+                            Grid.ColumnSpan="5" Margin="0,18,0,0" Grid.RowSpan="2" />
 
         </Grid>
     </Grid>

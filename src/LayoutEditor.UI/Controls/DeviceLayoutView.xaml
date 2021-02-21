@@ -36,8 +36,8 @@
                         <TranslateTransform X="{Binding PanX}" Y="{Binding PanY}" />
                     </TransformGroup>
                 </Grid.RenderTransform>
-                <Image Source="{Binding EditorViewModel.DeviceImagePath}" Stretch="Fill"/>
-                <ItemsControl ItemsSource="{Binding LedViewModels}">
+                <Image Source="{Binding EditorViewModel.DeviceImage}" Stretch="Fill" />
+                <ItemsControl ItemsSource="{Binding Items}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />
@@ -127,7 +127,7 @@
                        Grid.Row="8"
                        Grid.Column="0"
                        Visibility="{Binding SelectedLed.IsEditingShape, Converter={StaticResource BoolToVisibilityConverter}}" />
-                <xctk:IntegerUpDown 
+                <TextBox
                     Height="23"
                     Text="{Binding SelectedLed.ShapeEditor.RoundDecimals}"
                     VerticalAlignment="Top"
@@ -161,7 +161,7 @@
                 <Button Command="{s:Action ApplyLed}" Content="Apply" Grid.Row="13" Grid.Column="0" HorizontalAlignment="Stretch" Margin="5 5 2 0" VerticalAlignment="Top" />
                 <Button Command="{s:Action RemoveLed}" Content="Remove LED" Grid.Row="13" Grid.Column="1" HorizontalAlignment="Stretch" Margin="5 5 0 0" VerticalAlignment="Top" />
 
-                <ListBox Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,5,0,5" ItemsSource="{Binding LedViewModels}" SelectedItem="{Binding SelectedLed}">
+                <ListBox Grid.Row="14" Grid.Column="0" Grid.ColumnSpan="2" Margin="5,5,0,5" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedLed}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Label Content="{Binding LedLayout.Id}" />

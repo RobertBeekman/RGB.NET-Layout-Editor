@@ -19,7 +19,7 @@
         <Border.Background>
             <ImageBrush AlignmentX="Center" AlignmentY="Center"
                         Stretch="Fill"
-                        ImageSource="{Binding LedImageSource}" />
+                        ImageSource="{Binding LedImage}" />
         </Border.Background>
         <Path Data="{Binding DisplayGeometry}"
               Clip="{Binding Data, RelativeSource={RelativeSource Self}}"
