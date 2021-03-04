@@ -7,13 +7,11 @@ using System.Web;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using LayoutEditor.UI.Controls;
 using LayoutEditor.UI.Dialogs;
 using LayoutEditor.UI.Layout;
 using LayoutEditor.UI.Models;
-using Microsoft.VisualBasic;
 using Ookii.Dialogs.Wpf;
 using RGB.NET.Core;
 using RGB.NET.Layout;
@@ -102,8 +100,13 @@ namespace LayoutEditor.UI.Pages
 
             var filePath = new Uri(new Uri(Model.FilePath), LayoutCustomDeviceData.DeviceImage).LocalPath;
             if (_fileWatcher != null)
+            {
                 _fileWatcher.Changed -= FileWatcherOnChanged;
+                _fileWatcher = null;
+            }
 
+            if (!Directory.Exists(Path.GetDirectoryName(filePath)))
+                return;
             _fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(filePath)!, Path.GetFileName(filePath)!)
             {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.Size,
@@ -151,16 +154,16 @@ namespace LayoutEditor.UI.Pages
                 ShowNewFolderButton = true
             };
 
-            bool? result = dialog.ShowDialog();
+            var result = dialog.ShowDialog();
             if (result != true)
                 return;
 
-            string directory = Path.Combine(
+            var directory = Path.Combine(
                 dialog.SelectedPath,
                 DeviceLayout.Vendor,
                 DeviceLayout.Type.ToString()
             );
-            string filePath = Path.Combine(directory, GetLayoutFileName());
+            var filePath = Path.Combine(directory, GetLayoutFileName());
             Directory.CreateDirectory(directory);
 
             // Create a copy of the layout, image paths are about to be rewritten
@@ -210,7 +213,7 @@ namespace LayoutEditor.UI.Pages
                     continue;
 
                 // Only the image of the current logical layout is available as an URI, iterate each layout and find the images manually
-                foreach (LayoutCustomLedDataLogicalLayout logicalLayout in layoutCustomLedData.LogicalLayouts)
+                foreach (var logicalLayout in layoutCustomLedData.LogicalLayouts)
                 {
                     if (led["CustomData"] == null)
                         led.AppendChild(doc.CreateElement("CustomData"));
@@ -268,7 +271,7 @@ namespace LayoutEditor.UI.Pages
         public string GetLayoutFileName(bool includeExtension = true)
         {
             // Take out invalid file name chars, may not be perfect but neither are you
-            string fileName = DeviceLayout.Model != null
+            var fileName = DeviceLayout.Model != null
                 ? Path.GetInvalidFileNameChars().Aggregate(DeviceLayout.Model, (current, c) => current.Replace(c, '-'))
                 : "Unknown";
             if (DeviceLayout.Type == RGBDeviceType.Keyboard)

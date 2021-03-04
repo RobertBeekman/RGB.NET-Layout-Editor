@@ -115,8 +115,13 @@ namespace LayoutEditor.UI.Controls
 
             var filePath = new Uri(new Uri(Model.FilePath), _logicalLayout.Image).LocalPath;
             if (_fileWatcher != null)
+            {
                 _fileWatcher.Changed -= FileWatcherOnChanged;
+                _fileWatcher = null;
+            }
 
+            if (!Directory.Exists(Path.GetDirectoryName(filePath))) 
+                return;
             _fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(filePath)!, Path.GetFileName(filePath)!)
             {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.Size,
