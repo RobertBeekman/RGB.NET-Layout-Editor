@@ -6,32 +6,33 @@
 trigger:
 - master
 
+resources:
+  repositories:
+  - repository: RGBNET
+    type: github
+    endpoint: github.com_SpoinkyNL
+    name: DarthAffe/RGB.NET
+    ref: Development
+
 pool:
   vmImage: 'windows-latest'
 
 variables:
   solution: '**/LayoutEditor.sln'
+  rgbSolution: '**/RGB.NET.sln'
 
 steps:
+- checkout: RGBNET
+  path: s/RGB.NET
 - checkout: self
   path: s/RGB.NET-Layout-Editor
 
-- task: DownloadPipelineArtifact@2
-  displayName: 'Download RGB.NET build artifacts'
-  inputs:
-    buildType: 'specific'
-    project: '882fdc71-c09c-4923-8ab0-2cd9fcf0656d'
-    definition: '3'
-    buildVersionToDownload: 'latest'
-    artifactName: 'RGB.NET development build'
-    targetPath: '$(Pipeline.Workspace)\s\RGB.NET\bin\net5.0'
-
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet restore LayoutEditor'
+  displayName: 'RGB.NET - Build'
   inputs:
-    command: 'restore'
-    projects: '$(solution)'
-    feedsToUse: 'select'
+    command: 'build'
+    projects: '$(rgbSolution)'
+    arguments: '--configuration Release'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish LayoutEditor'
