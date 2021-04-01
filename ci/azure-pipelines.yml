@@ -66,6 +66,7 @@ steps:
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'gitTag'
+    tagPattern: 'release-v0.*'
     releaseNotesSource: 'inline'
     releaseNotesInline: 'Automated release by Azure Pipelines'
     changeLogCompareToRelease: 'lastFullRelease'
