@@ -20,6 +20,7 @@ using SharpVectors.Renderers.Wpf;
 using Stylet;
 using Color = System.Windows.Media.Color;
 using Point = System.Windows.Point;
+using SolidColorBrush = System.Windows.Media.SolidColorBrush;
 
 namespace LayoutEditor.UI.Controls
 {
@@ -353,7 +354,8 @@ namespace LayoutEditor.UI.Controls
 
         protected override void OnClose()
         {
-            _fileWatcher.Changed -= FileWatcherOnChanged;
+            if (_fileWatcher != null)
+                _fileWatcher.Changed -= FileWatcherOnChanged;
             base.OnClose();
         }
 

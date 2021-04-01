@@ -39,7 +39,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '$(solution)'
-    arguments: '--runtime win-x64 --self-contained false --output $(Build.BinariesDirectory) /nowarn:cs1591'
+    arguments: '--runtime win-x64 -p:PublishSingleFile=true --self-contained false --output $(Build.BinariesDirectory) /nowarn:cs1591'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -65,7 +65,6 @@ steps:
     action: 'create'
     target: '$(Build.SourceVersion)'
     tagSource: 'gitTag'
-    tagPattern: 'release-v0.*'
     releaseNotesSource: 'inline'
     releaseNotesInline: 'Automated release by Azure Pipelines'
     changeLogCompareToRelease: 'lastFullRelease'
