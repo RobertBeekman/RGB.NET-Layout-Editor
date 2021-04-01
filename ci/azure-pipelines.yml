@@ -20,7 +20,11 @@ pool:
 variables:
   solution: '**/LayoutEditor.sln'
   rgbSolution: '**/RGB.NET.sln'
-
+  MajorVersion: 1
+  MinorVersion: 0
+  InitialReleaseTagNumber: 1
+  IncrementReleaseTagNumber: $[counter(variables['InitialReleaseTagNumber'], 0)]
+  
 steps:
 - checkout: RGBNET
   path: s/RGB.NET
