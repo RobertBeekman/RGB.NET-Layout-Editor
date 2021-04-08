@@ -3,8 +3,10 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Serialization;
@@ -143,15 +145,20 @@ namespace LayoutEditor.UI.Pages
             _shellViewModel.Reset();
         }
 
-        public void Save()
+        public async Task Save()
         {
             _windowManager.ShowMessageBox("Select a target directory in which to save your layout, a directory structure and XML file will be created automatically");
+
+            var userLayoutsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Artemis", "user layouts");
+            if (!Directory.Exists(userLayoutsPath))
+                Directory.CreateDirectory(userLayoutsPath);
 
             VistaFolderBrowserDialog dialog = new()
             {
                 Description = "Select layout export target folder",
                 UseDescriptionForTitle = true,
-                ShowNewFolderButton = true
+                ShowNewFolderButton = true, 
+                SelectedPath = userLayoutsPath
             };
 
             var result = dialog.ShowDialog();
@@ -205,7 +212,7 @@ namespace LayoutEditor.UI.Pages
             foreach (var deviceLayoutLed in DeviceLayout.Leds)
             {
                 var layoutCustomLedData = (LayoutCustomLedData) deviceLayoutLed.CustomData;
-                if (layoutCustomLedData?.LogicalLayouts == null)
+                if (layoutCustomLedData?.LogicalLayouts == null || layoutCustomLedData.LogicalLayouts.All(l => string.IsNullOrWhiteSpace(l.Image)))
                     continue;
 
                 var led = doc["Device"]["Leds"].ChildNodes.Cast<XmlNode>().FirstOrDefault(l => l.Attributes != null && l.Attributes["Id"].Value == deviceLayoutLed.Id);

@@ -46,14 +46,7 @@ namespace LayoutEditor.UI.Pages
         {
             var model = new LayoutEditModel();
 
-            _windowManager.ShowMessageBox("Select the base folder of the layout. All other paths will be relative to this folder.");
-
-            // Select a base path
-            var dialog = new VistaFolderBrowserDialog();
-            if (dialog.ShowDialog() != true)
-                return;
-
-            model.FilePath = Path.Combine(dialog.SelectedPath, "New layout.xml");
+            model.FilePath = Path.Combine(Path.GetTempPath(), "New layout.xml");
             model.DeviceLayout = new DeviceLayout {CustomData = new LayoutCustomDeviceData()};
 
             _shellViewModel.Start(model);

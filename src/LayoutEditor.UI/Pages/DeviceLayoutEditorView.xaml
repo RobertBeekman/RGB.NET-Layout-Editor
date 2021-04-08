@@ -57,30 +57,34 @@
 
             <Label Content="Name" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
                    Grid.Row="0" Grid.ColumnSpan="2" />
-            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Name}" VerticalAlignment="Top"
-                     Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="3" />
+            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Name, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"
+                     Grid.Column="2" Grid.Row="0" />
+            <Label Content="Author" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3"
+                   Grid.Row="0" />
+            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Author, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"
+                     Grid.Column="4" Grid.Row="0" />
 
             <Label Content="Description" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
                    Grid.Row="1" Grid.ColumnSpan="2" />
-            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Description}"
+            <TextBox MinHeight="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Description, UpdateSourceTrigger=PropertyChanged}"
                      VerticalAlignment="Top" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="3" />
 
             <Label Content="Vendor" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
                    Grid.Row="2" Grid.ColumnSpan="2" />
-            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Vendor}" VerticalAlignment="Top"
+            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Vendor, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"
                      Grid.Column="2" Grid.Row="2" />
             <Label Content="Model" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3"
                    Grid.Row="2" />
-            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Model}" VerticalAlignment="Top"
+            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding DeviceLayout.Model, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top"
                      Grid.Column="4" Grid.Row="2" />
 
-            <Label Content="Width" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
+            <Label Content="Width (mm)" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
                    Grid.Row="3" Grid.ColumnSpan="2" />
-            <TextBox Height="23" Text="{Binding DeviceLayout.Width}" VerticalAlignment="Top" Grid.Column="2"
+            <TextBox Height="23" Text="{Binding DeviceLayout.Width, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Grid.Column="2"
                      Grid.Row="3" />
-            <Label Content="Height" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3"
+            <Label Content="Heigh (mm)" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="3"
                    Grid.Row="3" />
-            <TextBox Height="23" Text="{Binding DeviceLayout.Height}" VerticalAlignment="Top" Grid.Column="4"
+            <TextBox Height="23" Text="{Binding DeviceLayout.Height, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Grid.Column="4"
                      Grid.Row="3" />
 
             <Label Content="Type" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="0"
@@ -120,6 +124,7 @@
                 <TextBox Height="23" Width="50" Text="{Binding DeviceLayout.LedUnitWidth}" VerticalAlignment="Top" />
                 <Label Content="X" Height="22" Margin="15, 0" VerticalAlignment="Top" HorizontalAlignment="Center" />
                 <TextBox Height="23" Width="50" Text="{Binding DeviceLayout.LedUnitHeight}" VerticalAlignment="Top" />
+                <Label Content="mm" Height="22" Margin="5, 0" VerticalAlignment="Top" HorizontalAlignment="Center" />
             </StackPanel>
 
             <ContentControl s:View.Model="{Binding DeviceLayoutViewModel}" Grid.Column="0" Grid.Row="6"

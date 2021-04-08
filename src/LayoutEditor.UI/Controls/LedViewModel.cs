@@ -97,6 +97,9 @@ namespace LayoutEditor.UI.Controls
 
         private void ApplyLogicalLayout()
         {
+            if (LayoutCustomLedData == null)
+                LedLayout.CustomData = new LayoutCustomLedData();
+            
             if (_layoutViewModel.EditorViewModel.SelectedLogicalLayout == "Empty")
                 _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault();
             else
