@@ -16,8 +16,7 @@ namespace LayoutEditor.UI.Layout
             LogicalLayouts = new List<LayoutCustomLedDataLogicalLayout>();
         }
 
-        [XmlArray("LogicalLayouts")]
-        public List<LayoutCustomLedDataLogicalLayout> LogicalLayouts { get; set; }
+        [XmlArray("LogicalLayouts")] public List<LayoutCustomLedDataLogicalLayout> LogicalLayouts { get; set; }
     }
 
     /// <summary>
@@ -26,10 +25,8 @@ namespace LayoutEditor.UI.Layout
     [XmlType("LogicalLayout")]
     public class LayoutCustomLedDataLogicalLayout
     {
-        [XmlAttribute("Name")]
-        public string Name { get; set; }
+        [XmlAttribute("Name")] public string Name { get; set; }
 
-        [XmlAttribute("Image")]
-        public string Image { get; set; }
+        [XmlAttribute("Image")] public string Image { get; set; }
     }
 }

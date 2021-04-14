@@ -17,7 +17,7 @@ namespace LayoutEditor.UI
         {
             // Perform any other configuration before the application starts
         }
-        
+
         protected override void OnUnhandledException(DispatcherUnhandledExceptionEventArgs e)
         {
             var windowManager = Container.Get<IWindowManager>();

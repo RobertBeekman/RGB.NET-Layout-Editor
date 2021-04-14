@@ -10,7 +10,6 @@ namespace LayoutEditor.UI.Layout
     [XmlRoot("CustomData")]
     public class LayoutCustomDeviceData
     {
-        [XmlElement("DeviceImage")]
-        public string DeviceImage { get; set; }
+        [XmlElement("DeviceImage")] public string DeviceImage { get; set; }
     }
 }

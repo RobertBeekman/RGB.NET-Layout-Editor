@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:LayoutEditor.UI.Pages"
              xmlns:s="https://github.com/canton7/Stylet"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -11,7 +10,7 @@
         <TextBlock Margin="5,75,5,5" TextAlignment="Center">
             <Run Text="Welcome to the RGB.NET layout editor. " /><LineBreak /><Run Text="Choose one of the options below to edit or create a new layout." />
         </TextBlock>
-        <Button Command="{s:Action LoadFromXml}" Content="Load from XML" Width="200" Margin="5,70,5,5" />        
+        <Button Command="{s:Action LoadFromXml}" Content="Load from XML" Width="200" Margin="5,70,5,5" />
         <Button Command="{s:Action CreateNew}" Content="Create new layout" Width="200" Margin="5" />
     </StackPanel>
 </UserControl>

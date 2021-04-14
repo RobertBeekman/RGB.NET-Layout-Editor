@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Windows;
-using System.Xml;
 using LayoutEditor.UI.Layout;
 using LayoutEditor.UI.Models;
 using Ookii.Dialogs.Wpf;

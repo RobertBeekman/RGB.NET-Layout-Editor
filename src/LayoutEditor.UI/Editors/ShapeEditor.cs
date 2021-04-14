@@ -9,7 +9,7 @@ namespace LayoutEditor.UI.Editors
     public class ShapeEditor
     {
         public Point PendingPoint { get; set; }
-        public List<Point> Points { get; set; } = new List<Point>();
+        public List<Point> Points { get; set; } = new();
         public int? RoundDecimals { get; set; }
 
         public void Click(Point point)
@@ -29,7 +29,6 @@ namespace LayoutEditor.UI.Editors
             if (!Points.Any())
                 return new EllipseGeometry(PendingPoint, 0.025, 0.025);
             if (Points.Count == 1)
-            {
                 return new GeometryGroup
                 {
                     Children = new GeometryCollection
@@ -38,7 +37,6 @@ namespace LayoutEditor.UI.Editors
                         new EllipseGeometry(PendingPoint, 0.025, 0.025)
                     }
                 };
-            }
 
             var pathFigure = new PathFigure(Points.First(), new List<PathSegment>(), true);
             var pathGeometry = new PathGeometry();

@@ -39,31 +39,6 @@ namespace LayoutEditor.UI.Controls
         public double PanX { get; set; } = 1;
         public double PanY { get; set; } = 1;
 
-        private void DeviceLayoutViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            // Handle changing selected LED from listbox
-            if (e.PropertyName == nameof(SelectedLed) && SelectedLed != null && !SelectedLed.Selected)
-            {
-                var oldSelection = Items.FirstOrDefault(l => l.Selected);
-                if (oldSelection != null)
-                {
-                    oldSelection.Selected = false;
-                    oldSelection.SetColor(LedViewModel.UnselectedColor);
-                }
-
-                SelectLed(SelectedLed);
-            }
-        }
-
-        private void EditorViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(EditorViewModel.SelectedLogicalLayout))
-            {
-                NotifyOfPropertyChange(() => LedImageText);
-                UpdateLeds();
-            }
-        }
-
         public void UpdateLeds()
         {
             // Update the LEDs in the RGB.NET device layout
@@ -79,10 +54,7 @@ namespace LayoutEditor.UI.Controls
             }
 
             // Update the LEDs in the VMs
-            foreach (var ledViewModel in Items)
-            {
-                ledViewModel.Update();
-            }
+            foreach (var ledViewModel in Items) ledViewModel.Update();
         }
 
         public void ChangeZoomLevel(object sender, MouseWheelEventArgs e)
@@ -224,7 +196,7 @@ namespace LayoutEditor.UI.Controls
 
         protected override void OnInitialActivate()
         {
-            Items.AddRange(DeviceLayout.Leds.Select(l => new LedViewModel(Model, this, _windowManager, (LedLayout)l)));
+            Items.AddRange(DeviceLayout.Leds.Select(l => new LedViewModel(Model, this, _windowManager, (LedLayout) l)));
             UpdateLeds();
 
             PropertyChanged += DeviceLayoutViewModelPropertyChanged;
@@ -237,9 +209,9 @@ namespace LayoutEditor.UI.Controls
                 activeWindow.KeyUp += KeyUpDown;
             }
 
-            var ledWithLayout = Items.FirstOrDefault(i => i.LayoutCustomLedData != null && 
+            var ledWithLayout = Items.FirstOrDefault(i => i.LayoutCustomLedData != null &&
                                                           i.LayoutCustomLedData.LogicalLayouts.Any())?.LayoutCustomLedData.LogicalLayouts.FirstOrDefault();
-            if (ledWithLayout != null) 
+            if (ledWithLayout != null)
                 EditorViewModel.LedSubfolder = Path.GetDirectoryName(ledWithLayout.Image);
 
             base.OnInitialActivate();
@@ -258,6 +230,31 @@ namespace LayoutEditor.UI.Controls
             }
 
             base.OnClose();
+        }
+
+        private void DeviceLayoutViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // Handle changing selected LED from listbox
+            if (e.PropertyName == nameof(SelectedLed) && SelectedLed != null && !SelectedLed.Selected)
+            {
+                var oldSelection = Items.FirstOrDefault(l => l.Selected);
+                if (oldSelection != null)
+                {
+                    oldSelection.Selected = false;
+                    oldSelection.SetColor(LedViewModel.UnselectedColor);
+                }
+
+                SelectLed(SelectedLed);
+            }
+        }
+
+        private void EditorViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(EditorViewModel.SelectedLogicalLayout))
+            {
+                NotifyOfPropertyChange(() => LedImageText);
+                UpdateLeds();
+            }
         }
     }
 }

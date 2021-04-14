@@ -32,8 +32,8 @@ namespace LayoutEditor.UI.Controls
 
         private readonly DeviceLayoutViewModel _layoutViewModel;
         private readonly IWindowManager _windowManager;
-        private LayoutCustomLedDataLogicalLayout _logicalLayout;
         private FileSystemWatcher _fileWatcher;
+        private LayoutCustomLedDataLogicalLayout _logicalLayout;
 
         public LedViewModel(LayoutEditModel model, DeviceLayoutViewModel layoutViewModel, IWindowManager windowManager, LedLayout ledLayout)
         {
@@ -95,50 +95,6 @@ namespace LayoutEditor.UI.Controls
         public SolidColorBrush FillBrush { get; set; }
         public SolidColorBrush BorderBrush { get; set; }
 
-        private void ApplyLogicalLayout()
-        {
-            if (LayoutCustomLedData == null)
-                LedLayout.CustomData = new LayoutCustomLedData();
-            
-            if (_layoutViewModel.EditorViewModel.SelectedLogicalLayout == "Empty")
-                _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault();
-            else
-                _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault(l => l.Name == _layoutViewModel.EditorViewModel.SelectedLogicalLayout);
-            
-            if (_logicalLayout == null)
-            {
-                _logicalLayout = new LayoutCustomLedDataLogicalLayout();
-                _logicalLayout.Name = _layoutViewModel.EditorViewModel.SelectedLogicalLayout == "Empty"
-                    ? null
-                    : _layoutViewModel.EditorViewModel.SelectedLogicalLayout;
-                LayoutCustomLedData.LogicalLayouts.Add(_logicalLayout);
-            }
-
-            InputImage = Path.GetFileName(_logicalLayout.Image);
-            NotifyOfPropertyChange(nameof(LedImage));
-
-            var filePath = new Uri(new Uri(Model.FilePath), _logicalLayout.Image).LocalPath;
-            if (_fileWatcher != null)
-            {
-                _fileWatcher.Changed -= FileWatcherOnChanged;
-                _fileWatcher = null;
-            }
-
-            if (!Directory.Exists(Path.GetDirectoryName(filePath))) 
-                return;
-            _fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(filePath)!, Path.GetFileName(filePath)!)
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.Size,
-                EnableRaisingEvents = true
-            };
-            _fileWatcher.Changed += FileWatcherOnChanged;
-        }
-
-        private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
-        {
-            NotifyOfPropertyChange(nameof(LedImage));
-        }
-
         public void ApplyInput()
         {
             LedLayout.Id = InputId;
@@ -178,71 +134,6 @@ namespace LayoutEditor.UI.Controls
             _logicalLayout.Image = HttpUtility.UrlDecode(relativePath.OriginalString);
             InputImage = Path.GetFileName(_logicalLayout.Image);
             NotifyOfPropertyChange(nameof(LedImage));
-        }
-
-        private void UpdateAvailableLedIds()
-        {
-            AvailableLedIds.Clear();
-            AvailableLedIds.AddRange(Model.GetAvailableLedIds(LedLayout.Id));
-        }
-
-        private void PopulateInput()
-        {
-            InputId = AvailableLedIds.First(l => l.Equals(LedLayout.Id));
-            InputShape = LedLayout.Shape;
-            InputShapeData = LedLayout.ShapeData;
-            InputX = LedLayout.DescriptiveX;
-            InputY = LedLayout.DescriptiveY;
-            InputWidth = LedLayout.DescriptiveWidth;
-            InputHeight = LedLayout.DescriptiveHeight;
-        }
-
-        private void CreateLedGeometry()
-        {
-            var geometryRectangle = new Rect(0, 0, 1, 1);
-            Geometry geometry;
-
-            if (ShapeEditor != null)
-                try
-                {
-                    geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true),
-                        GeometryCombineMode.Xor, null);
-                }
-                catch (Exception)
-                {
-                    geometry = ShapeEditor.GetGeometry(true);
-                }
-            else
-                switch (LedLayout.Shape)
-                {
-                    case Shape.Custom:
-                        try
-                        {
-                            geometry = Geometry.Parse(LedLayout.ShapeData);
-                        }
-                        catch (Exception e)
-                        {
-                            geometry = new RectangleGeometry(geometryRectangle);
-                            _windowManager.ShowMessageBox(
-                                "Failed to parse shape data, showing a rectangle instead.\n\n " + e.Message, InputId);
-                        }
-
-                        break;
-                    case Shape.Rectangle:
-                        geometry = new RectangleGeometry(geometryRectangle);
-                        break;
-                    case Shape.Circle:
-                        geometry = new EllipseGeometry(geometryRectangle);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-            DisplayGeometry = Geometry.Combine(Geometry.Empty, geometry, GeometryCombineMode.Union,
-                new ScaleTransform(LedLayout.Width, LedLayout.Height));
-            SetColor(Selected ? SelectedColor : UnselectedColor);
-
-            NotifyOfPropertyChange(() => LedLayout);
         }
 
         public void SetColor(Color borderColor, Color? fillColor = null)
@@ -350,20 +241,6 @@ namespace LayoutEditor.UI.Controls
             return result;
         }
 
-        private Point GetPercentagePosition(Point position)
-        {
-            return new(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
-        }
-
-        protected override void OnClose()
-        {
-            if (_fileWatcher != null)
-                _fileWatcher.Changed -= FileWatcherOnChanged;
-            base.OnClose();
-        }
-
-        #region Event handlers
-
         public void MouseUp(object sender, MouseEventArgs e)
         {
             _layoutViewModel.SelectLed(this);
@@ -398,6 +275,125 @@ namespace LayoutEditor.UI.Controls
                 SetColor(UnselectedColor);
         }
 
-        #endregion
+        protected override void OnClose()
+        {
+            if (_fileWatcher != null)
+                _fileWatcher.Changed -= FileWatcherOnChanged;
+            base.OnClose();
+        }
+
+        private void ApplyLogicalLayout()
+        {
+            if (LayoutCustomLedData == null)
+                LedLayout.CustomData = new LayoutCustomLedData();
+
+            if (_layoutViewModel.EditorViewModel.SelectedLogicalLayout == "Empty")
+                _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault();
+            else
+                _logicalLayout = LayoutCustomLedData.LogicalLayouts.FirstOrDefault(l => l.Name == _layoutViewModel.EditorViewModel.SelectedLogicalLayout);
+
+            if (_logicalLayout == null)
+            {
+                _logicalLayout = new LayoutCustomLedDataLogicalLayout();
+                _logicalLayout.Name = _layoutViewModel.EditorViewModel.SelectedLogicalLayout == "Empty"
+                    ? null
+                    : _layoutViewModel.EditorViewModel.SelectedLogicalLayout;
+                LayoutCustomLedData.LogicalLayouts.Add(_logicalLayout);
+            }
+
+            InputImage = Path.GetFileName(_logicalLayout.Image);
+            NotifyOfPropertyChange(nameof(LedImage));
+
+            var filePath = new Uri(new Uri(Model.FilePath), _logicalLayout.Image).LocalPath;
+            if (_fileWatcher != null)
+            {
+                _fileWatcher.Changed -= FileWatcherOnChanged;
+                _fileWatcher = null;
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(filePath)))
+                return;
+            _fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(filePath)!, Path.GetFileName(filePath)!)
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.Size,
+                EnableRaisingEvents = true
+            };
+            _fileWatcher.Changed += FileWatcherOnChanged;
+        }
+
+        private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
+        {
+            NotifyOfPropertyChange(nameof(LedImage));
+        }
+
+        private void UpdateAvailableLedIds()
+        {
+            AvailableLedIds.Clear();
+            AvailableLedIds.AddRange(Model.GetAvailableLedIds(LedLayout.Id));
+        }
+
+        private void PopulateInput()
+        {
+            InputId = AvailableLedIds.First(l => l.Equals(LedLayout.Id));
+            InputShape = LedLayout.Shape;
+            InputShapeData = LedLayout.ShapeData;
+            InputX = LedLayout.DescriptiveX;
+            InputY = LedLayout.DescriptiveY;
+            InputWidth = LedLayout.DescriptiveWidth;
+            InputHeight = LedLayout.DescriptiveHeight;
+        }
+
+        private void CreateLedGeometry()
+        {
+            var geometryRectangle = new Rect(0, 0, 1, 1);
+            Geometry geometry;
+
+            if (ShapeEditor != null)
+                try
+                {
+                    geometry = Geometry.Combine(Geometry.Parse(LedLayout.ShapeData), ShapeEditor.GetGeometry(true),
+                        GeometryCombineMode.Xor, null);
+                }
+                catch (Exception)
+                {
+                    geometry = ShapeEditor.GetGeometry(true);
+                }
+            else
+                switch (LedLayout.Shape)
+                {
+                    case Shape.Custom:
+                        try
+                        {
+                            geometry = Geometry.Parse(LedLayout.ShapeData);
+                        }
+                        catch (Exception e)
+                        {
+                            geometry = new RectangleGeometry(geometryRectangle);
+                            _windowManager.ShowMessageBox(
+                                "Failed to parse shape data, showing a rectangle instead.\n\n " + e.Message, InputId);
+                        }
+
+                        break;
+                    case Shape.Rectangle:
+                        geometry = new RectangleGeometry(geometryRectangle);
+                        break;
+                    case Shape.Circle:
+                        geometry = new EllipseGeometry(geometryRectangle);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+            DisplayGeometry = Geometry.Combine(Geometry.Empty, geometry, GeometryCombineMode.Union,
+                new ScaleTransform(LedLayout.Width, LedLayout.Height));
+            SetColor(Selected ? SelectedColor : UnselectedColor);
+
+            NotifyOfPropertyChange(() => LedLayout);
+        }
+
+        private Point GetPercentagePosition(Point position)
+        {
+            return new(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
+        }
     }
 }

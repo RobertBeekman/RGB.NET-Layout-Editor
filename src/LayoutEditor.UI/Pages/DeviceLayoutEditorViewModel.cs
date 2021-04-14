@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Serialization;
@@ -95,33 +94,6 @@ namespace LayoutEditor.UI.Pages
             }
         }
 
-        private void UpdateDeviceImage()
-        {
-            InputImage = Path.GetFileName(LayoutCustomDeviceData.DeviceImage);
-            NotifyOfPropertyChange(nameof(DeviceImage));
-
-            var filePath = new Uri(new Uri(Model.FilePath), LayoutCustomDeviceData.DeviceImage).LocalPath;
-            if (_fileWatcher != null)
-            {
-                _fileWatcher.Changed -= FileWatcherOnChanged;
-                _fileWatcher = null;
-            }
-
-            if (!Directory.Exists(Path.GetDirectoryName(filePath)))
-                return;
-            _fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(filePath)!, Path.GetFileName(filePath)!)
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.Size,
-                EnableRaisingEvents = true
-            };
-            _fileWatcher.Changed += FileWatcherOnChanged;
-        }
-
-        private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
-        {
-            NotifyOfPropertyChange(nameof(DeviceImage));
-        }
-
         public void SelectDeviceImage()
         {
             VistaOpenFileDialog dialog = new();
@@ -157,7 +129,7 @@ namespace LayoutEditor.UI.Pages
             {
                 Description = "Select layout export target folder",
                 UseDescriptionForTitle = true,
-                ShowNewFolderButton = true, 
+                ShowNewFolderButton = true,
                 SelectedPath = userLayoutsPath
             };
 
@@ -295,6 +267,33 @@ namespace LayoutEditor.UI.Pages
                 _fileWatcher.Changed -= FileWatcherOnChanged;
 
             base.OnClose();
+        }
+
+        private void UpdateDeviceImage()
+        {
+            InputImage = Path.GetFileName(LayoutCustomDeviceData.DeviceImage);
+            NotifyOfPropertyChange(nameof(DeviceImage));
+
+            var filePath = new Uri(new Uri(Model.FilePath), LayoutCustomDeviceData.DeviceImage).LocalPath;
+            if (_fileWatcher != null)
+            {
+                _fileWatcher.Changed -= FileWatcherOnChanged;
+                _fileWatcher = null;
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(filePath)))
+                return;
+            _fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(filePath)!, Path.GetFileName(filePath)!)
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Attributes | NotifyFilters.CreationTime | NotifyFilters.FileName | NotifyFilters.Size,
+                EnableRaisingEvents = true
+            };
+            _fileWatcher.Changed += FileWatcherOnChanged;
+        }
+
+        private void FileWatcherOnChanged(object sender, FileSystemEventArgs e)
+        {
+            NotifyOfPropertyChange(nameof(DeviceImage));
         }
     }
 }

@@ -25,8 +25,7 @@
               Clip="{Binding Data, RelativeSource={RelativeSource Self}}"
               Fill="{Binding FillBrush}"
               Stroke="{Binding BorderBrush}"
-              StrokeThickness="1">            
-        </Path>
+              StrokeThickness="1" />
     </Border>
 
 </UserControl>
