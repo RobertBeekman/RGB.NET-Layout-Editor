@@ -177,28 +177,23 @@ namespace LayoutEditor.UI.Controls
         public void ImportSvg()
         {
             // Select a XML file
-            string fileName = null;
-
-            VistaOpenFileDialog dialog = new();
-            dialog.Filter = "Scalable Vector Graphics (*.svg)|*.svg";
+            var dialog = new VistaOpenFileDialog {Filter = "Scalable Vector Graphics (*.svg)|*.svg"};
 
             var result = dialog.ShowDialog();
             if (result == false)
                 return;
 
-            fileName = dialog.FileName;
-
-            var settings = new WpfDrawingSettings();
-            settings.IncludeRuntime = true;
-            settings.TextAsGeometry = true;
-
+            var fileName = dialog.FileName;
+            var xamlFileName = fileName.Replace(".svg", ".xaml");
+            var settings = new WpfDrawingSettings {IncludeRuntime = true, TextAsGeometry = true};
             var converter = new FileSvgConverter(settings);
-            converter.Convert(fileName);
-            var xaml = File.ReadAllText(fileName.Replace(".svg", ".xaml"));
-            File.Delete(fileName.Replace(".svg", ".xaml"));
 
-            var parsed = (DrawingGroup) XamlReader.Parse(xaml,
-                new ParserContext {BaseUri = new Uri(Path.GetDirectoryName(fileName))});
+            using var fileStream = File.OpenRead(fileName);
+            converter.Convert(fileStream, xamlFileName);
+            var xaml = File.ReadAllText(xamlFileName);
+            File.Delete(xamlFileName);
+
+            var parsed = (DrawingGroup) XamlReader.Parse(xaml, new ParserContext {BaseUri = new Uri(Path.GetDirectoryName(fileName))});
             var geometry = GatherGeometry(parsed);
 
             var group = new DrawingGroup {Children = new DrawingCollection(geometry)};
