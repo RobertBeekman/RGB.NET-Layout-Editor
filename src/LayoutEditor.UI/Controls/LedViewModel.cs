@@ -329,7 +329,9 @@ namespace LayoutEditor.UI.Controls
 
         private void PopulateInput()
         {
-            InputId = AvailableLedIds.First(l => l.Equals(LedLayout.Id));
+            var ledId = AvailableLedIds.FirstOrDefault(l => l.Equals(LedLayout.Id));
+
+            InputId = ledId ?? throw new Exception($"Failed to find LED ID {LedLayout.Id}, the layout editor may need an update.");
             InputShape = LedLayout.Shape;
             InputShapeData = LedLayout.ShapeData;
             InputX = LedLayout.DescriptiveX;
