@@ -10,7 +10,7 @@
         d:DataContext="{d:DesignInstance local:AddLedViewModel}" ResizeMode="NoResize">
     <StackPanel Margin="5">
         <Label Content="Select a LED ID, only LED IDs that are not yet taken are shown." HorizontalAlignment="Left" VerticalAlignment="Top" />
-        <ComboBox ItemsSource="{Binding AvailableLedIds}" SelectedValue="{Binding SelectedId}" VerticalAlignment="Top" Margin="5,10,5,0">
+        <ComboBox ItemsSource="{Binding AvailableLedIds}" Text="{Binding SelectedId}" VerticalAlignment="Top" Margin="5,10,5,0" IsEditable="True">
             <ComboBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel />

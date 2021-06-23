@@ -75,7 +75,7 @@ namespace LayoutEditor.UI.Controls
         {
             get
             {
-                if (_logicalLayout.Image == null)
+                if (string.IsNullOrWhiteSpace(_logicalLayout.Image))
                     return DependencyProperty.UnsetValue;
                 var fileUri = new Uri(new Uri(Model.FilePath), _logicalLayout.Image);
                 if (!File.Exists(fileUri.LocalPath))
@@ -329,9 +329,16 @@ namespace LayoutEditor.UI.Controls
 
         private void PopulateInput()
         {
-            var ledId = AvailableLedIds.FirstOrDefault(l => l.Equals(LedLayout.Id));
+            if (int.TryParse(LedLayout.Id, out int numericLedId))
+            {
+                InputId = LedLayout.Id;
+            }
+            else
+            {
+                var ledId = AvailableLedIds.FirstOrDefault(l => l.Equals(LedLayout.Id));
+                InputId = ledId ?? throw new Exception($"Failed to find LED ID {LedLayout.Id}, the layout editor may need an update.");
+            }
 
-            InputId = ledId ?? throw new Exception($"Failed to find LED ID {LedLayout.Id}, the layout editor may need an update.");
             InputShape = LedLayout.Shape;
             InputShapeData = LedLayout.ShapeData;
             InputX = LedLayout.DescriptiveX;
