@@ -85,7 +85,13 @@
                 <Label Content="Click a LED to start editing it" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" />
 
                 <Label Content="LED ID" Grid.Row="1" Grid.Column="0" />
-                <ComboBox ItemsSource="{Binding SelectedLed.AvailableLedIds}" SelectedValue="{Binding SelectedLed.InputId}" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1" />
+                <ComboBox ItemsSource="{Binding SelectedLed.AvailableLedIds}" SelectedValue="{Binding SelectedLed.InputId}" VerticalAlignment="Top" Grid.Row="1" Grid.Column="1">
+                    <ComboBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel />
+                        </ItemsPanelTemplate>
+                    </ComboBox.ItemsPanel>
+                </ComboBox>
 
                 <Label Content="Shape" Grid.Row="2" Grid.Column="0" />
                 <ComboBox ItemsSource="{Binding Source={StaticResource ShapeDataProvider}}" SelectedValue="{Binding SelectedLed.InputShape}" VerticalAlignment="Top" Grid.Row="2" Grid.Column="1" />

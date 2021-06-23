@@ -33,6 +33,7 @@ namespace LayoutEditor.UI.Pages
 
             Model = model;
             DeviceLayout = model.DeviceLayout;
+            DeviceLayout.CustomData ??= new LayoutCustomDeviceData();
             DeviceLayoutViewModel = new DeviceLayoutViewModel(Model, this, windowManager);
             DeviceLayoutViewModel.ConductWith(this);
 
@@ -80,6 +81,8 @@ namespace LayoutEditor.UI.Pages
         {
             get
             {
+                if (string.IsNullOrEmpty(LayoutCustomDeviceData.DeviceImage))
+                    return DependencyProperty.UnsetValue;
                 var fileUri = new Uri(new Uri(Model.FilePath), LayoutCustomDeviceData.DeviceImage);
                 if (!File.Exists(fileUri.LocalPath))
                     return DependencyProperty.UnsetValue;
