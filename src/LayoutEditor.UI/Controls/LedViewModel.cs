@@ -399,5 +399,12 @@ namespace LayoutEditor.UI.Controls
         {
             return new(Math.Round(position.X / LedLayout.Width, 3), Math.Round(position.Y / LedLayout.Height, 3));
         }
+
+        public void ClearImage()
+        {
+            _logicalLayout.Image = null;
+            InputImage = null;
+            NotifyOfPropertyChange(nameof(LedImage));
+        }
     }
 }

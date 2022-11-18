@@ -6,37 +6,19 @@
 trigger:
 - master
 
-resources:
-  repositories:
-  - repository: RGBNET
-    type: github
-    endpoint: github.com_SpoinkyNL
-    name: DarthAffe/RGB.NET
-    ref: Development
-
 pool:
   vmImage: 'windows-latest'
 
 variables:
   solution: '**/LayoutEditor.sln'
-  rgbSolution: '**/RGB.NET.sln'
   MajorVersion: 1
   MinorVersion: 0
   InitialReleaseTagNumber: 1
   IncrementReleaseTagNumber: $[counter(variables['InitialReleaseTagNumber'], 0)]
   
 steps:
-- checkout: RGBNET
-  path: s/RGB.NET
 - checkout: self
   path: s/RGB.NET-Layout-Editor
-
-- task: DotNetCoreCLI@2
-  displayName: 'RGB.NET - Build'
-  inputs:
-    command: 'build'
-    projects: '$(rgbSolution)'
-    arguments: '--configuration Release'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish LayoutEditor'
@@ -44,7 +26,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '$(solution)'
-    arguments: '--runtime win-x64 -p:PublishSingleFile=true --self-contained false --output $(Build.BinariesDirectory) /nowarn:cs1591'
+    arguments: '--runtime win-x64 -p:PublishSingleFile=true --self-contained true --output $(Build.BinariesDirectory) /nowarn:cs1591'
     zipAfterPublish: false
     modifyOutputPath: false
 

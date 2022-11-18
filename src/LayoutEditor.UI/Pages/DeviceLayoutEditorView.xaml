@@ -106,9 +106,15 @@
             <Label Content="LED folder (opt.)" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top"
                    Grid.Column="3" Grid.Row="5"
                    ToolTip="The subfolder to place the LED images in (optional and relative to the layout location)" />
-            <TextBox Height="23" TextWrapping="Wrap" Text="{Binding LedSubfolder}" VerticalAlignment="Top"
-                     Grid.Column="4" Grid.Row="5" />
-
+            <Grid Grid.Column="4" Grid.Row="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Height="23"  TextWrapping="Wrap" Text="{Binding LedSubfolder}" VerticalAlignment="Top"/>
+                <Button Grid.Column="1" VerticalAlignment="Top" Command="{s:Action ClearAllLedImages}">Clear all</Button>
+            </Grid>
+            
             <Label Content="Logical layout" Height="26" HorizontalAlignment="Left" VerticalAlignment="Top"
                    Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2" Margin="0,26,0,0" Grid.RowSpan="2" />
             <ComboBox ItemsSource="{Binding LogicalLayouts}" SelectedValue="{Binding SelectedLogicalLayout}"

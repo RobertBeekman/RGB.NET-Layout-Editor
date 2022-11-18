@@ -110,6 +110,14 @@ namespace LayoutEditor.UI.Pages
             UpdateDeviceImage();
         }
 
+        public void ClearAllLedImages()
+        {
+            foreach (var ledViewModel in DeviceLayoutViewModel.Items)
+            {
+                ledViewModel.ClearImage();
+            }
+        }
+
         public void AddImageLayout()
         {
             _windowManager.ShowDialog(new AddImageLayoutViewModel(_windowManager, this));
